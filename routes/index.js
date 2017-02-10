@@ -1,6 +1,8 @@
 var config  = require('../config.json');
 var express = require('express');
 var router  = express.Router();
+var pf = require('pathfinding');
+var ai = require('../ai.js');
 
 // Handle GET request to '/'
 router.get(config.routes.info, function (req, res) {
@@ -27,6 +29,19 @@ router.post(config.routes.start, function (req, res) {
 // Handle POST request to '/move'
 router.post(config.routes.move, function (req, res) {
   // Do something here to generate your move
+
+  var snakes = body.snakes;
+  var mySnake = {};
+  var foodArray = body.food;
+  var foodPath;
+  var grid = new pf.Grid(body.width, body.height);
+
+  // mark my snake -- args(snakes, grid, mySnake)
+  ai.markSelfAndUnwalkable(snakes, grid, mySnake);
+  // find closest food -- args(foodArray, mySnake, gridCopy)
+  ai.findClosestFoodPath(foodArray, mySnake, grid.clone());
+
+
 
   // Response data
   var data = {

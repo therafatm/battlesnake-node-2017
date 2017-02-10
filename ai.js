@@ -1,5 +1,6 @@
 var pf = require('pathfinding');
 var config  = require('./config.json');
+var finder = new PF.AStarFinder();
 
 //finds direction to go from head to destination
 var findDirection = function(head, dest) {
@@ -17,43 +18,50 @@ var findDirection = function(head, dest) {
     }
 };
 
-function markSnakes(snake, mySnake){
-	return 1;
+var markSelfAndUnwalkable_ = function(snakes, grid, mySnake){
+
+	snakes.forEach((s)=>{
+		if(config.snake.id === s.id){
+			// find our snake
+			mySnake.head = s.coords[0];
+			mySnake.health = s.health;
+		}
+		// set unwalkable squares - other snake body  
+		s.coords.forEach((pos)=>{
+		  grid.setWalkableAt(pos[0], pos[1], false);
+		});
+	});
 }
 
 //finds shortest path from head to target
-var shortestPath = function(body, target){
-	var snakes = body.snakes;
-	var walls = body.walls;
-	//console.log("TARGET POS: " + target);
-    var grid = new pf.Grid(body.width, body.height);
+var shortestPath_ = function(mySnake, target, grid){
 
-    snakes.map(markSnakes);
-    for(var i = 0; i < snakes.length; i++){
-		// find our snake's head
-		if (config.snake.id === snakes[i].id) {
-		    mySnake.head = snakes[i].coords[0];
-			mySnake.health = snakes[i].health;
-		}
-
-		// set unwalkable squares - snake's tails
-		for (var j = 0; j < snakes[i].coords.length; j++) {
-		    grid.setWalkableAt(snakes[i].coords[j][0], snakes[i].coords[j][1], false);
-		}
-    }
-	
-	// set unwalkable squares - walls
-	if(walls){
-		for (var i = 0; i < walls.length; i++) {
-			grid.setWalkableAt(walls[i][0], walls[i][1], false);
-		}
-	}
-
-	// use A* algorithm to find the shortest path to target item
-    var finder = new PF.AStarFinder();
+	// use A* to find the shortest path to target item
     var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
-
     console.log("Current Path:");
     console.log(path);
 	return path;
 };
+
+var findClosestFoodPath_ = function(foodArray, mySnake, gridCopy){
+
+	var closestFoodPath = null;
+	foodArray.forEach((food) => {
+		var path = shortestPath_(mySnake, food, gridCopy);
+		if (closestFoodPath === null) {
+		    closestFoodPath = path;
+		} else if (path.length < closestFoodPath.length) {
+			closestFoodPath = path;
+		}
+	});
+
+	return closestFoodPath;
+}
+
+var api = {
+	markSelfAndUnwalkable: markSelfAndUnwalkable_,
+	shortestPath: shortestPath_,
+	findClosestFoodPath: findClosestFoodPath_
+}
+
+module.exports = api;
