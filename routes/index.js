@@ -30,22 +30,36 @@ router.post(config.routes.start, function (req, res) {
 router.post(config.routes.move, function (req, res) {
   // Do something here to generate your move
 
+  var win = 'north';
+  var enemySnakeHeads = [];
   var snakes = body.snakes;
   var mySnake = {};
   var foodArray = body.food;
   var foodPath;
   var grid = new pf.Grid(body.width, body.height);
 
-  // mark my snake -- args(snakes, grid, mySnake)
-  ai.markSelfAndUnwalkable(snakes, grid, mySnake);
+  // mark my snake -- args(snakes, grid, mySnake, enemySnakeHeads)
+  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakeHeads);
   // find closest food -- args(foodArray, mySnake, gridCopy)
-  ai.findClosestFoodPath(foodArray, mySnake, grid.clone());
+  var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
+  if(closestFoodPaths.length === 0){
+    //TODO: Handle case when no path to food exists
+  }
 
+  var foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakeHeads);
+  if(foodToGetPos > closestFoodPaths.length){
+    //TODO: GO INTO SAFE MODE
+  }
 
+  else{
+    //TODO: GO TOWARDS FOOD
+    var foodToGet = closestFoodPaths[foodToGetPos];
+    win = ai.findDirection(mySnake[0], foodToGet[0]); 
+  }
 
   // Response data
   var data = {
-    move: 'north', // one of: ["north", "east", "south", "west"]
+    move: win // one of: ["north", "east", "south", "west"]
     taunt: config.snake.taunt.move
   };
 
