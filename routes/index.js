@@ -37,18 +37,28 @@ router.post(config.routes.move, function (req, res) {
   var foodArray = body.food;
   var foodPath;
   var grid = new pf.Grid(body.width, body.height);
+  var footToGetPos = -1;
 
-  // mark my snake -- args(snakes, grid, mySnake, enemySnakeHeads)
+  // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakeHeads);
-  // find closest food -- args(foodArray, mySnake, gridCopy)
+  // find closest food list -- args(foodArray, mySnake, gridCopy)
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
-  if(closestFoodPaths.length === 0){
-    //TODO: Handle case when no path to food exists
+  if(closestFoodPaths.length > 0){
+    foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakeHeads);
   }
 
-  var foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakeHeads);
-  if(foodToGetPos > closestFoodPaths.length){
+  //Can't reach any food faster than others
+  if(closestFoodPaths.length === 0 || foodToGetPos > closestFoodPaths.length){
     //TODO: GO INTO SAFE MODE
+    console.log("SAFE MODE");
+    var toTail = ai.shortestPath(mySnake, mySnake[mySnake.length - 1], grid.clone());
+    if(toTail.length > 0){
+      win = ai.findDirection(mySnake[0], toTail[0]);
+    }
+    else{
+    //TODO: HANDLE NO PATH TO TAIL
+    console.log("THIS IS A PROBLEM.");  
+    }
   }
 
   else{
