@@ -69,7 +69,7 @@ router.post(config.routes.move, function (req, res) {
 
   // Response data
   var data = {
-    move: win // one of: ["north", "east", "south", "west"]
+    move: win, // one of: ["north", "east", "south", "west"]
     taunt: config.snake.taunt.move
   };
 

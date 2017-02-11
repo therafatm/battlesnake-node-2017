@@ -1,6 +1,6 @@
 var pf = require('pathfinding');
 var config  = require('./config.json');
-var finder = new PF.AStarFinder();
+var finder = new pf.AStarFinder();
 
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
