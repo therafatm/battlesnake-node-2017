@@ -12,8 +12,7 @@ var findDirection_ = function(start, dest) {
         return 'west';
     } else if (ydif === 1){
         return 'north';
-    }
-    else if (ydif === -1){
+    } else if (ydif === -1){
         return 'south';
     }
 };

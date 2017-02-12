@@ -4,6 +4,7 @@ var express     = require('express');
 var logger      = require('morgan');
 var app         = express();
 var routes      = require('./routes');
+var cors        = require('cors');
 
 app.set('port', (process.env.PORT || config.port));
 // For deployment to Heroku, the port needs to be set using ENV, so
@@ -11,6 +12,7 @@ app.set('port', (process.env.PORT || config.port));
 
 app.enable('verbose errors');
 
+app.use(cors);
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(routes);
