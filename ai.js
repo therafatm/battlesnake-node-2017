@@ -18,6 +18,7 @@ var findDirection_ = function(start, dest) {
 };
 
 var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
+    console.log(snakes);
 
 	snakes.forEach((s)=>{
 		if(config.snake.id === s.id){
@@ -34,7 +35,7 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
 		  grid.setWalkableAt(pos[0], pos[1], false);
 		});
 	});
-}
+};
 
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
@@ -61,7 +62,7 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 	});
 
 	return foodPaths;
-}
+};
 
 // returns int greater than input array length if no best path exists
 var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakeHeads){
@@ -86,11 +87,11 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakeHeads){
     }
 
     return bestPathPos; 
-}
+};
 
 function findDistance(start, destination){
     return ( Math.abs(start[0] - destination[0]) + Math.abs(start[1]-destination[1]) );
-};
+}
 
 var api = {
 	initSelfGridSnakeHeads: initSelfGridSnakeHeads_,
@@ -98,6 +99,6 @@ var api = {
 	findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
 	findBestFoodPathPos: findBestFoodPathPos_,
 	findDirection: findDirection_
-}
+};
 
 module.exports = api;

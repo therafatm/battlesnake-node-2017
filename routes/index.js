@@ -19,6 +19,8 @@ router.get(config.routes.info, function (req, res) {
 router.post(config.routes.start, function (req, res) {
   // Do something here to start the game
   // Response data
+
+  console.log(req.body);
   var data = {
     taunt: config.snake.taunt.start
   };
@@ -30,6 +32,8 @@ router.post(config.routes.start, function (req, res) {
 router.post(config.routes.move, function (req, res) {
   // Do something here to generate your move
 
+  var body = req.body;
+  console.log(body);
   var win = 'north';
   var enemySnakeHeads = [];
   var snakes = body.snakes;
