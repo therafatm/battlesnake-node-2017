@@ -12,7 +12,7 @@ app.set('port', (process.env.PORT || config.port));
 
 app.enable('verbose errors');
 
-app.use(cors);
+app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(routes);
