@@ -18,19 +18,18 @@ var findDirection_ = function(start, dest) {
 };
 
 var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
-    console.log(snakes);
 
 	snakes.forEach((s)=>{
 		if(config.snake.id === s.id){
 			// find our snake
 			mySnake.head = s.coords[0];
-			mySnake.health = s.health;
+			mySnake.health = s.health_points;
 		}
 		else{
 			enemySnakeHeads.push(s.coords[0]);
 		}
 
-		// set unwalkable squares - other snake body  
+		// set unwalkable squares - other snake body
 		s.coords.forEach((pos)=>{
 		  grid.setWalkableAt(pos[0], pos[1], false);
 		});
@@ -40,18 +39,18 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
 	// use A* to find the shortest path to target item
-    var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
-    console.log("Current Path:");
-    console.log(path);
+  var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
+  console.log("Current Path:");
+  console.log(path);
 	return path;
 };
 
-//returns null when no path to any food exists
+//returns empty array when no path to any food exists
 var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 
 	var foodPaths = [];
 	foodArray.forEach((food) => {
-		var path = shortestPath_(mySnake, food, gridCopy);
+		var path = shortestPath_(mySnake, food, gridCopy.clone());
 		if(path.length > 0){
 			foodPaths.push(path);
 		}
@@ -64,7 +63,9 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 	return foodPaths;
 };
 
-// returns int greater than input array length if no best path exists
+
+//TODO: review this method
+// returns -1 if no best path exists
 var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakeHeads){
 
     var bestPathPos = 0;
@@ -86,7 +87,7 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakeHeads){
         }
     }
 
-    return bestPathPos; 
+    return bestPathPos === closestFoodInOrder.length ? -1 : bestPathPos;
 };
 
 function findDistance(start, destination){

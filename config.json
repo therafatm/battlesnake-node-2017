@@ -1,6 +1,6 @@
 {
   "host": "localhost",
-  "port": 9001,
+  "port": 5000,
   "routes": {
     "info": "/",
     "start": "/start",
@@ -8,6 +8,7 @@
     "end": "/end"
   },
   "snake" : {
+	"id" : "A",
     "name": "battlesnake-node",
     "color": "#fff000",
     "head_url": "http://battlesnake-node.herokuapp.com/",

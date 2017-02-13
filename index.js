@@ -54,6 +54,7 @@ app.use(function (err, req, res, next) {
   var statusCode = err.status || 500;
 
   console.log(err);
+  console.log(err.stack);
   res.status(statusCode);
   res.send({
     status: statusCode,
