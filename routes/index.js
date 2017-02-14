@@ -31,6 +31,7 @@ router.post(config.routes.start, function (req, res) {
 router.post(config.routes.move, function (req, res) {
   // Do something here to generate your move
 
+  console.time("Move");
   var body = req.body;
   console.log(body);
   var win = 'north';
@@ -81,6 +82,7 @@ router.post(config.routes.move, function (req, res) {
     taunt: config.snake.taunt.move
   };
 
+  console.timeEnd("Move");
   return res.json(data);
 });
 

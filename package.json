@@ -26,6 +26,6 @@
     "node": "4.x"
   },
   "scripts": {
-    "start": "nodemon start"
+    "start": "nodemon server.js"
   }
 }
