@@ -28,7 +28,7 @@ var findDirection_ = function(start, dest) {
 var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
 
 	snakes.forEach((s)=>{
-		if(config.snake.id === s.id){
+		if(mySnake.snakeId === s.id){
 			// find our snake	
             mySnake.head = s.coords[0];
             if(s.coords.length > 1){

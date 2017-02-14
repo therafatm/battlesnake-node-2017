@@ -37,6 +37,7 @@ router.post(config.routes.move, function (req, res) {
   var enemySnakeHeads = [];
   var snakes = body.snakes;
   var mySnake = {};
+  mySnake.snakeId = body.you;
   var foodArray = body.food;
   var foodPath;
   var grid = new pf.Grid(body.width, body.height);
