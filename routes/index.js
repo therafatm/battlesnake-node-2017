@@ -60,7 +60,7 @@ router.post(config.routes.move, function (req, res) {
   if(closestFoodPaths.length === 0 || foodToGetPos === -1){
     //TODO: GO INTO SAFE MODE
     console.log("SAFE MODE");
-    var toTail = ai.shortestPath(mySnake, mySnake[mySnake.length - 1], grid.clone());
+    var toTail = ai.shortestPath(mySnake, mySnake.tail, grid.clone());
     if(toTail.length > 0){
       win = ai.findDirection(mySnake[0], toTail[0]);
     }
