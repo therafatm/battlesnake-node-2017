@@ -4,14 +4,8 @@ var finder = new pf.AStarFinder();
 
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
-    if(start === undefined){
-        console.log(start);
-    }
-
-    if(dest === undefined){
-        console.log(dest);
-    }
-
+    console.log(start);
+    console.log(dest);
     var xdif = dest[0] - start[0];
     var ydif = dest[1] - start[1];
     if (xdif === 1) {
@@ -121,10 +115,10 @@ var findSafeZones_ = function(gridCopy) {
     var count = 0;
     var n = gridCopy.height;
     if (n == 0) return -1;
-    var m = gridCopy[0].width;
+    var m = gridCopy.width;
     for (var i = 0; i < n; i++){
         for (var j = 0; j < m; j++)
-            if (gridCopy.nodes[i][j] == '1') {
+            if (gridCopy.nodes[i][j].walkable) {
                 var size = DFSMarking(gridCopy, i, j);
                 if(size >= 9){
                     safeZones.push({ pos: [i,j], size: size});
@@ -141,7 +135,7 @@ var findSafeZones_ = function(gridCopy) {
     });
 
     return safeZones;
-}
+};
 
 function DFSMarking(grid, i, j) {
     var size = 0;
@@ -155,14 +149,37 @@ function DFSMarking(grid, i, j) {
     return size;
 }
 
+function withinBounds(x,y,grid){
+    return x < grid.width && x > 0 && y < grid.height && y > 0;
+}
+
+function getSafeTail_(grid, tail) {
+    var x = tail[0];
+    var y = tail[1];
+
+    if (withinBounds(x,y+1,grid) && grid.isWalkableAt(x,y+1)) {
+       return [x,y+1];
+    } else if (withinBounds(x,y-1,grid) && grid.isWalkableAt(x,y-1)) {
+      return [x,y-1];
+    } else if (withinBounds(x+1,y, grid) && grid.isWalkableAt(x+1,y))  {
+      return [x+1,y];
+    } else if (withinBounds(x-1,y, grid) && grid.isWalkableAt(x-1,y)) {
+      return [x-1,y];
+    }
+
+    //Edge case??
+    return [0,0];
+}
+
 var api = {
 	initSelfGridSnakeHeads: initSelfGridSnakeHeads_,
 	shortestPath: shortestPath_,
 	findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
 	findBestFoodPathPos: findBestFoodPathPos_,
 	findDirection: findDirection_,
-    findSafeZones: findSafeZones_,
-    findBestSafeZone: findBestSafeZone_
+  findSafeZones: findSafeZones_,
+  findBestSafeZone: findBestSafeZone_,
+  getSafeTail : getSafeTail_
 };
 
 module.exports = api;
