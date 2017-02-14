@@ -50,6 +50,8 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
     // use A* to find the shortest path to target item
+    console.log(mySnake.head);
+    console.log(target);
     var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
     console.log("Current Path:");
     console.log(path);
@@ -58,11 +60,10 @@ var shortestPath_ = function(mySnake, target, grid){
 
 //returns empty array when no path to any food exists
 var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
-
 	var foodPaths = [];
 	foodArray.forEach((food) => {
 		// gridCopy is a clone. No need to clone.
-        var path = shortestPath_(mySnake, food, gridCopy);
+        var path = shortestPath_(mySnake, food, gridCopy.clone());
 		if(path.length > 0){
 			foodPaths.push(path);
 		}
