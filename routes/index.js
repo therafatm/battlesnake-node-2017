@@ -45,6 +45,7 @@ router.post(config.routes.move, function (req, res) {
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakeHeads);
   // find closest food list -- args(foodArray, mySnake, gridCopy)
+
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakeHeads.length){
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakeHeads);
@@ -60,7 +61,10 @@ router.post(config.routes.move, function (req, res) {
     }
     else{
     //TODO: HANDLE NO PATH TO TAIL
-      console.error("No path to tail");
+      var safeZonesInOrder = ai.findSafeZones(grid.clone());
+      var bestSafeZoneIndex = ai.findBestSafeZone(mySnake, safeZonesInOrder);
+      win = ai.findDirection(mySnake[0], safeZonesInOrder[bestSafeZoneIndex].pos);
+      //console.error("No path to tail");
     }
   }
 
