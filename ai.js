@@ -29,10 +29,10 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
 
 	snakes.forEach((s)=>{
 		if(mySnake.snakeId === s.id){
-			// find our snake	
+			// find our snake
             mySnake.head = s.coords[0];
             if(s.coords.length > 1){
-                mySnake.tail = s.coords[s.coords.length - 1];                   
+                mySnake.tail = s.coords[s.coords.length - 1];
             }
             mySnake.health = s.health_points;
 		}
@@ -63,7 +63,7 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 	var foodPaths = [];
 	foodArray.forEach((food) => {
 		// gridCopy is a clone. No need to clone.
-        var path = shortestPath_(mySnake, food, gridCopy.clone());
+    var path = shortestPath_(mySnake, food, gridCopy.clone());
 		if(path.length > 0){
 			foodPaths.push(path);
 		}
@@ -89,7 +89,6 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakeHeads){
             var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
             if(distance <= closestFoodInOrder[i].length){
                 //TODO: eat snake
-                bestPathPos++;
                 posChanged = true;
                 break;
             }
@@ -106,7 +105,7 @@ var findBestSafeZone_ = function(mySnake, safeZones){
     for(var i = 0; i < safeZones.length; i++){
         var distance = findDistance(mySnake.head, safeZones[i].pos);
         if(distance != null || distance > 0){
-            return i;    
+            return i;
         }
     }
     return -1;
@@ -145,7 +144,7 @@ var findSafeZones_ = function(gridCopy) {
 }
 
 function DFSMarking(grid, i, j) {
-    var size = 0;    
+    var size = 0;
     if (i < 0 || j < 0 || i >= n || j >= m || !grid.nodes[i][j].walkable) return size;
     grid.nodes[i][j].walkable = false;
     size += 1;

@@ -33,7 +33,10 @@ router.post(config.routes.move, function (req, res) {
 
   console.time("Move");
   var body = req.body;
-  console.log(body);
+  console.dir(body, {
+    depth: null,
+    colors: true
+  });
   var win = 'north';
   var enemySnakeHeads = [];
   var snakes = body.snakes;
@@ -82,6 +85,7 @@ router.post(config.routes.move, function (req, res) {
     taunt: config.snake.taunt.move
   };
 
+  console.log(win);
   console.timeEnd("Move");
   return res.json(data);
 });
