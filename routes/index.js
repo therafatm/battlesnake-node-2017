@@ -38,7 +38,7 @@ router.post(config.routes.move, function (req, res) {
     colors: true
   });
   var win = 'north';
-  var enemySnakeHeads = [];
+  var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
   var mySnake = {};
   mySnake.snakeId = body.you;
@@ -48,14 +48,14 @@ router.post(config.routes.move, function (req, res) {
   var foodToGetPos = 0;
 
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
-  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakeHeads);
+  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
   // find closest food list -- args(foodArray, mySnake, gridCopy)
   console.log("My Snake");
   console.log(mySnake);
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
-  if(closestFoodPaths.length && enemySnakeHeads.length){
-    foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakeHeads);
+  if(closestFoodPaths.length && enemySnakes.head.length){
+    foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
   }
 
   //Can't reach any food faster than others

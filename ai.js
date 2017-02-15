@@ -19,7 +19,7 @@ var findDirection_ = function(start, dest) {
     }
 };
 
-var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
+var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 
 	snakes.forEach((s)=>{
 		if(mySnake.snakeId === s.id){
@@ -29,9 +29,11 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakeHeads){
                 mySnake.tail = s.coords[s.coords.length - 1];
             }
             mySnake.health = s.health_points;
+            mySnake.len = s.coords.length;
 		}
 		else{
-			enemySnakeHeads.push(s.coords[0]);
+            enemySnakes.head.push(s.coords[0]);
+            enemySnakes.len.push(s.coords.length);
 		}
 
 		// set unwalkable squares - other snake body
@@ -47,8 +49,6 @@ var shortestPath_ = function(mySnake, target, grid){
     console.log(mySnake.head);
     console.log(target);
     var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
-    console.log("Current Path:");
-    console.log(path);
 	return path;
 };
 
@@ -71,17 +71,17 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 };
 
 
-//TODO: review this method
 // returns -1 if no best path exists
-var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakeHeads){
+var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
 
     var posChanged = false;
     for(var i = 0; i < closestFoodInOrder.length; i++){
-        for(var j = 0; j < enemySnakeHeads.length; j++) {
-            var snakehead = enemySnakeHeads[j];
+        for(var j = 0; j < enemySnakes.head.length; j++) {
+            var snakehead = enemySnakes.head[j];
             //distance between enemy snake to current best food
             var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
-            if(distance <= closestFoodInOrder[i].length){
+            if((distance < closestFoodInOrder[i].length) ||
+                (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
                 //TODO: eat snake
                 posChanged = true;
                 break;
