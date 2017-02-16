@@ -11,11 +11,15 @@ let currentEnemySnakes = new bf.BloomFilter();
 
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
+    console.log("start:");
     console.log(start);
+    console.log("end:");
     console.log(dest);
     var xdif = dest[0] - start[0];
     var ydif = dest[1] - start[1];
+    console.log('xdif');
     console.log(xdif);
+    console.log('ydif');
     console.log(ydif);    
     if (xdif === 1) {
         return 'east';
@@ -66,8 +70,10 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
     // use A* to find the shortest path to target item
-    // console.log(mySnake.head);
-    // console.log(target);
+    console.log("my head:");
+    console.log(mySnake.head);
+    console.log("target:");
+    console.log(target);
     var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
 	return path;
 };
@@ -117,6 +123,9 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
 };
 
 var findBestSafeZone_ = function(mySnake, safeZones){
+    console.log("Within reachable safe zones:\nSafeZones:");
+    console.log(safeZones);
+
     for(var i = 0; i < safeZones.length; i++){
         var distance = findDistance(mySnake.head, safeZones[i].pos);
         if(distance != null || distance > 0){
@@ -145,7 +154,7 @@ var findSafeZones_ = function(mySnake, gridCopy) {
         for (var j = 0; j < m; j++){
             if (gridCopy.isWalkableAt(i,j)) {
                 var radius = BFSMarking(gridCopy.clone(), i, j, n, m);
-                if(radius >= 3){
+                if(radius >= 1){
                     safeZones.push({ pos: [i,j], radius: radius});
                     j+= radius;
                     i+= radius;
@@ -163,7 +172,7 @@ var findSafeZones_ = function(mySnake, gridCopy) {
         return a.radius - b.radius;
     });
 
-
+    console.log(safeZones);
     var reachableSafeZones = safeZones.filter( (safezone) => {
         var path = shortestPath_(mySnake, safezone.pos, gridCopy.clone());
         if(path.length){
