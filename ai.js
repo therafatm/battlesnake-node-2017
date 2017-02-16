@@ -2,6 +2,7 @@ var pf = require('pathfinding');
 var config  = require('./config.json');
 let bf = require('bloom-filter-js');
 var finder = new pf.AStarFinder();
+var fs = require('fs');
 
 console.log(bf);
 
@@ -14,6 +15,8 @@ var findDirection_ = function(start, dest) {
     console.log(dest);
     var xdif = dest[0] - start[0];
     var ydif = dest[1] - start[1];
+    console.log(xdif);
+    console.log(ydif);    
     if (xdif === 1) {
         return 'east';
     } else if (xdif === -1) {
@@ -63,8 +66,8 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
     // use A* to find the shortest path to target item
-    console.log(mySnake.head);
-    console.log(target);
+    // console.log(mySnake.head);
+    // console.log(target);
     var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
 	return path;
 };
@@ -117,9 +120,13 @@ var findBestSafeZone_ = function(mySnake, safeZones){
     for(var i = 0; i < safeZones.length; i++){
         var distance = findDistance(mySnake.head, safeZones[i].pos);
         if(distance != null || distance > 0){
+            console.log("distance:");
+            console.log(distance);
             return i;
         }
     }
+
+    console.log("something wrong: -1\n");    
     return -1;
 }
 
@@ -131,18 +138,21 @@ var findSafeZones_ = function(mySnake, gridCopy) {
 
     var safeZones = [];
     var count = 0;
-    console.log(gridCopy);
     var n = gridCopy.height;
     if (n == 0) return -1;
     var m = gridCopy.width;
     for (var i = 0; i < n; i++){
-        for (var j = 0; j < m; j++)
+        for (var j = 0; j < m; j++){
             if (gridCopy.isWalkableAt(i,j)) {
                 var radius = BFSMarking(gridCopy.clone(), i, j, n, m);
                 if(radius >= 3){
                     safeZones.push({ pos: [i,j], radius: radius});
+                    j+= radius;
+                    i+= radius;
+                    break;
                 }
             }
+        }
     }
 
     if(safeZones.length === 0){
@@ -153,11 +163,18 @@ var findSafeZones_ = function(mySnake, gridCopy) {
         return a.radius - b.radius;
     });
 
+
     var reachableSafeZones = safeZones.filter( (safezone) => {
         var path = shortestPath_(mySnake, safezone.pos, gridCopy.clone());
-        if(path.length) return true;
+        if(path.length){
+            safezone.path = path;
+            return true;
+        } 
         else return false;
     });
+
+    console.log("reachableSafeZones: \n");
+    console.log(reachableSafeZones);
 
     return reachableSafeZones;
 };
@@ -175,6 +192,7 @@ function BFSMarking(grid, i, j, n, m) {
 
     queue.push(currentNode);
     while(queue.length){
+
         var oldCounter = counter;
         var currentNode = queue.shift();
         grid.setWalkableAt(currentNode.x, currentNode.y, false);
@@ -198,12 +216,11 @@ function BFSMarking(grid, i, j, n, m) {
         if(counter >= (level * 4)){
             level += 1;
             divider += 4;
-        }
 
-        var shouldConsiderRadius = (counter/divider) - Math.floor(counter/divider);
-
-        if(shouldConsiderRadius === 0 || shouldConsiderRadius >= 0.8){
-            radius++;
+            var shouldConsiderRadius = (counter/divider) - Math.floor(counter/divider);
+            if(shouldConsiderRadius === 0 || shouldConsiderRadius >= 0.8){
+                radius++;
+            }            
         }
 
         counter++

@@ -58,7 +58,7 @@ router.post(config.routes.move, function (req, res) {
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
   }
 
-  //Can't reach any food faster than others
+  // //Can't reach any food faster than others
   if(closestFoodPaths.length === 0 || foodToGetPos === -1){
     //TODO: GO INTO SAFE MODE
     console.log("SAFE MODE");
@@ -76,8 +76,10 @@ router.post(config.routes.move, function (req, res) {
     //TODO: HANDLE NO PATH TO TAIL
       var safeZonesInOrder = ai.findSafeZones(mySnake, grid);
       var bestSafeZoneIndex = ai.findBestSafeZone(mySnake, safeZonesInOrder);
-      win = ai.findDirection(mySnake.head, safeZonesInOrder[bestSafeZoneIndex].pos);
-      console.error("No path to tail");
+      win = ai.findDirection(mySnake.head, safeZonesInOrder[bestSafeZoneIndex].path[1]);
+      console.error("Win: ");
+      console.log(win);
+
     }
   }
 
@@ -93,7 +95,6 @@ router.post(config.routes.move, function (req, res) {
     taunt: config.snake.taunt.move
   };
 
-  console.log(win);
   console.timeEnd("Move");
   return res.json(data);
 });
