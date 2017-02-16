@@ -74,10 +74,10 @@ router.post(config.routes.move, function (req, res) {
     }
     else{
     //TODO: HANDLE NO PATH TO TAIL
-      var safeZonesInOrder = ai.findSafeZones(grid.clone());
+      var safeZonesInOrder = ai.findSafeZones(mySnake, grid);
       var bestSafeZoneIndex = ai.findBestSafeZone(mySnake, safeZonesInOrder);
       win = ai.findDirection(mySnake.head, safeZonesInOrder[bestSafeZoneIndex].pos);
-      //console.error("No path to tail");
+      console.error("No path to tail");
     }
   }
 

@@ -12,6 +12,7 @@
     }
   ],
   "dependencies": {
+    "bloom-filter-js": "0.0.12",
     "body-parser": "^1.14.1",
     "cors": "^2.8.1",
     "deps": "^0.1.2",

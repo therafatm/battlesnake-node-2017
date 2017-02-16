@@ -1,6 +1,12 @@
 var pf = require('pathfinding');
 var config  = require('./config.json');
+let bf = require('bloom-filter-js');
 var finder = new pf.AStarFinder();
+
+console.log(bf);
+
+let currentEnemySnakes = new bf.BloomFilter();
+
 
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
@@ -21,7 +27,10 @@ var findDirection_ = function(start, dest) {
 
 var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 
+    currentEnemySnakes = new bf.BloomFilter();
+    var isEnemy = false;
 	snakes.forEach((s)=>{
+        isEnemy = false;
 		if(mySnake.snakeId === s.id){
 			// find our snake
             mySnake.head = s.coords[0];
@@ -32,13 +41,21 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
             mySnake.len = s.coords.length;
 		}
 		else{
+            isEnemy = true;
             enemySnakes.head.push(s.coords[0]);
             enemySnakes.len.push(s.coords.length);
 		}
 
 		// set unwalkable squares - other snake body
 		s.coords.forEach((pos)=>{
+          if(grid === undefined){
+            console.log("GRID IS UNDEFINED\n!");
+          }
 		  grid.setWalkableAt(pos[0], pos[1], false);
+          if(isEnemy){
+              var posString = pos[0].toString() + "," + pos[1].toString()
+              currentEnemySnakes.add(posString);
+          }
 		});
 	});
 };
@@ -57,7 +74,8 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 	var foodPaths = [];
 	foodArray.forEach((food) => {
 		// gridCopy is a clone. No need to clone.
-    var path = shortestPath_(mySnake, food, gridCopy.clone());
+    var gcopy = gridCopy.clone();
+    var path = shortestPath_(mySnake, food, gcopy);
 		if(path.length > 0){
 			foodPaths.push(path);
 		}
@@ -109,19 +127,20 @@ function findDistance(start, destination){
     return ( Math.abs(start[0] - destination[0]) + Math.abs(start[1]-destination[1]) );
 };
 
-var findSafeZones_ = function(gridCopy) {
+var findSafeZones_ = function(mySnake, gridCopy) {
 
     var safeZones = [];
     var count = 0;
+    console.log(gridCopy);
     var n = gridCopy.height;
     if (n == 0) return -1;
     var m = gridCopy.width;
     for (var i = 0; i < n; i++){
         for (var j = 0; j < m; j++)
-            if (gridCopy.nodes[i][j].walkable) {
-                var size = DFSMarking(gridCopy, i, j);
-                if(size >= 9){
-                    safeZones.push({ pos: [i,j], size: size});
+            if (gridCopy.isWalkableAt(i,j)) {
+                var radius = BFSMarking(gridCopy.clone(), i, j, n, m);
+                if(radius >= 3){
+                    safeZones.push({ pos: [i,j], radius: radius});
                 }
             }
     }
@@ -131,22 +150,67 @@ var findSafeZones_ = function(gridCopy) {
     }
 
     safeZones.sort((a,b)=>{
-        return a.size - b.size;
+        return a.radius - b.radius;
     });
 
-    return safeZones;
+    var reachableSafeZones = safeZones.filter( (safezone) => {
+        var path = shortestPath_(mySnake, safezone.pos, gridCopy.clone());
+        if(path.length) return true;
+        else return false;
+    });
+
+    return reachableSafeZones;
 };
 
-function DFSMarking(grid, i, j) {
-    var size = 0;
-    if (i < 0 || j < 0 || i >= n || j >= m || !grid.nodes[i][j].walkable) return size;
-    grid.nodes[i][j].walkable = false;
-    size += 1;
-    size += DFSMarking(grid, i + 1, j);
-    size += DFSMarking(grid, i - 1, j);
-    size += DFSMarking(grid, i, j + 1);
-    size += DFSMarking(grid, i, j - 1);
-    return size;
+function BFSMarking(grid, i, j, n, m) {
+    var radius = 0;
+    var queue = [];
+    var nodesAdded = 0;   // to account itself being counted for
+    var divider = 0;
+    var counter = 0;
+    var level = 1;
+    var toLevel = 0;
+
+    var currentNode = grid.getNodeAt(i,j);
+
+    queue.push(currentNode);
+    while(queue.length){
+        var oldCounter = counter;
+        var currentNode = queue.shift();
+        grid.setWalkableAt(currentNode.x, currentNode.y, false);
+        var neighbours = grid.getNeighbors(currentNode, 2); // 2 because we dont want diagonal movement. check DiagonalMovement.js in pathfinding.js module
+        for(var k = 0; k < neighbours.length; k++){
+            var neighbour = neighbours[k];
+            var neighbourPosString = neighbour.x.toString() +  "," + neighbour.y.toString();
+            if(currentEnemySnakes.exists(neighbourPosString)){
+                return radius;
+            }
+
+            else{
+                if(grid.isWalkableAt(neighbour.x, neighbour.y)){
+                    nodesAdded++;    
+                    grid.setWalkableAt(neighbour.x, neighbour.y, false);
+                    queue.push(neighbour);
+                }
+            }
+        }
+        
+        if(counter >= (level * 4)){
+            level += 1;
+            divider += 4;
+        }
+
+        var shouldConsiderRadius = (counter/divider) - Math.floor(counter/divider);
+
+        if(shouldConsiderRadius === 0 || shouldConsiderRadius >= 0.8){
+            radius++;
+        }
+
+        counter++
+        //perimeter increases by 4 every block of radius
+    }
+
+    return radius;   
 }
 
 function withinBounds(x,y,grid){
@@ -155,7 +219,7 @@ function withinBounds(x,y,grid){
 
 function getSafeTail_(grid, tail) {
     var x = tail[0];
-    var y = tail[1];
+var y = tail[1];
 
     if (withinBounds(x,y+1,grid) && grid.isWalkableAt(x,y+1)) {
        return [x,y+1];
