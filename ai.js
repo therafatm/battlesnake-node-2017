@@ -143,6 +143,29 @@ function findDistance(start, destination){
     return ( Math.abs(start[0] - destination[0]) + Math.abs(start[1]-destination[1]) );
 };
 
+var goToCentre_ = function(mySnake, gridCopy){
+
+    var width = gridCopy.width;
+    var height = gridCopy.height;
+    var centre = [ Math.round((width -1)/2), Math.round((height-1)/2)];
+    var xmin = centre[0] - 2;
+    var xmax = centre[0] + 2;
+    var ymin = centre[1] - 2;
+    var ymax = centre[1] + 2;
+
+    //find safe spot in centre
+    for(var i = xmin; i <= xmax; i++){
+        for(var j = ymin; j <= ymax; j++){
+            if(gridCopy.isWalkableAt(i,j)){
+                return [i,j];
+            }
+        } 
+    }
+
+    console.log("No space in centre found.");
+    return[0,0];
+}
+
 var findSafeZones_ = function(mySnake, gridCopy) {
 
     var safeZones = [];
@@ -239,26 +262,43 @@ function BFSMarking(grid, i, j, n, m) {
     return radius;   
 }
 
-function withinBounds(x,y,grid){
-    return x < grid.width && x > 0 && y < grid.height && y > 0;
+function withinCentre_(x,y,width, height){
+
+    var centre = [ Math.round(width), Math.round(height) ];
+    var xmin = centre[0] - 2;
+    var xmax = centre[0] + 2;
+    var ymin = centre[1] - 2;
+    var ymax = centre[1] + 2;
+
+    return x <= xmax && x >= xmin && y <= ymax && y >= ymin;
 }
 
 function getSafeTail_(grid, tail) {
     var x = tail[0];
-var y = tail[1];
+    var y = tail[1];
 
-    if (withinBounds(x,y+1,grid) && grid.isWalkableAt(x,y+1)) {
+    if (grid.isInside(x,y+1) && grid.isWalkableAt(x,y+1)) {
        return [x,y+1];
-    } else if (withinBounds(x,y-1,grid) && grid.isWalkableAt(x,y-1)) {
+    } else if (grid.isInside(x,y-1) && grid.isWalkableAt(x,y-1)) {
       return [x,y-1];
-    } else if (withinBounds(x+1,y, grid) && grid.isWalkableAt(x+1,y))  {
+    } else if (grid.isInside(x+1,y) && grid.isWalkableAt(x+1,y))  {
       return [x+1,y];
-    } else if (withinBounds(x-1,y, grid) && grid.isWalkableAt(x-1,y)) {
+    } else if (grid.isInside(x-1,y) && grid.isWalkableAt(x-1,y)) {
       return [x-1,y];
     }
 
     //Edge case??
     return [0,0];
+}
+
+function goToTail_(mySnake, grid) {
+    console.log("im not within centre, following tail");      
+    var safeToTail = getSafeTail_(grid.clone(), mySnake.tail);
+    safeToTail = getSafeTail_(grid.clone(), safeToTail);
+    var toTail = shortestPath_(mySnake, safeToTail, grid.clone());        
+    console.log("Safe to tail:");
+    console.log(safeToTail);
+    return findDirection_(mySnake.head, toTail[1]);
 }
 
 var api = {
@@ -269,7 +309,10 @@ var api = {
 	findDirection: findDirection_,
   findSafeZones: findSafeZones_,
   findBestSafeZone: findBestSafeZone_,
-  getSafeTail : getSafeTail_
+  getSafeTail : getSafeTail_,
+  withinCentre : withinCentre_,
+  goToCentre : goToCentre_,
+  goToTail : goToTail_
 };
 
 module.exports = api;

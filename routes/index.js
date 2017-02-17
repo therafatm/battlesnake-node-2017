@@ -72,58 +72,27 @@ router.post(config.routes.move, function (req, res) {
     //TODO: GO INTO SAFE MODE
     console.log("SAFE MODE");
 
-    var safeToTail = ai.getSafeTail(grid.clone(), mySnake.tail);
-    safeToTail = ai.getSafeTail(grid.clone(), safeToTail);
-    console.log("Safe tail Pos");
-    console.log(safeToTail);
-    var toTail = ai.shortestPath(mySnake, safeToTail, grid.clone());
-    console.log("Path To tail");
-    console.log(toTail);
-    if(toTail.length > 1){
-      win = ai.findDirection(mySnake.head, toTail[1]);
+    //if not at centre, go to centre
+    if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], (body.width-1)/2, (body.height-1)/2)){
+      console.log("im within centre");
+      var centrePoint = ai.goToCentre(mySnake, grid);
+      console.log(centrePoint);
+      var shortestPath = ai.shortestPath(mySnake, centrePoint, grid.clone());
+      if (shortestPath.length>1) {
+        win = ai.findDirection(mySnake.head, shortestPath[1]);
+      } else {
+        win = ai.goToTail(mySnake, grid);
+      }
     }
-    else{
-    //TODO: HANDLE NO PATH TO TAIL
-      var safeZonesInOrder = ai.findSafeZones(mySnake, grid);
-      var bestSafeZoneIndex = ai.findBestSafeZone(mySnake, safeZonesInOrder);
-      if(bestSafeZoneIndex >= 0){
-        win = ai.findDirection(mySnake.head, safeZonesInOrder[bestSafeZoneIndex].path[1]);
-      }
-
-      else{
-        console.log("this is some weird shit.");
-      }
-
-      console.error("Win: ");
-      console.log(win);
-
+    else {
+      win = ai.goToTail(mySnake, grid);
     }
   }
 
   else{
     //TODO: GO TOWARDS FOOD
     var foodToGet = closestFoodPaths[foodToGetPos];
-    var safeToTail = ai.getSafeTail(grid.clone(), mySnake.tail);
-    safeToTail = ai.getSafeTail(grid.clone(), safeToTail);    
-    var toTail = ai.shortestPath({head: foodToGet[1]}, safeToTail, grid.clone());
-    if(toTail.length){
-      //if path to tail from next block, go for food
-      win = ai.findDirection(mySnake.head, foodToGet[1]);
-    }
-    else{
-      
-      toTail = ai.shortestPath(mySnake, safeToTail, grid.clone());
-      if(toTail.length){
-        win = ai.findDirection(mySnake.head, toTail[1]);
-      }
-      else{
-        console.log("oh fugg");
-      }
-    }
-
-    console.log("Safe tail Pos");
-    console.log(safeToTail);
-
+    win = ai.findDirection(mySnake.head, foodToGet[1]);
   }
 
   // Response data
