@@ -5,6 +5,9 @@ var logger      = require('morgan');
 var app         = express();
 var routes      = require('./routes');
 var cors        = require('cors');
+var ai          = require('./ai.js');
+var pf          = require('pathfinding');
+
 
 app.set('port', (process.env.PORT || config.port));
 // For deployment to Heroku, the port needs to be set using ENV, so
@@ -55,13 +58,26 @@ app.use(function (err, req, res, next) {
 
   console.log(err);
   console.log(err.stack);
-  res.status(statusCode);
-  res.send({
-    status: statusCode,
-    error: err
-  });
 
-  return;
+  var body = req.body;
+  var enemySnakes = {head:[], len:[]};
+  var snakes = body.snakes;
+  var mySnake = {coords: []};
+  mySnake.snakeId = body.you;
+  var grid = new pf.Grid(body.width, body.height);
+
+  // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
+  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
+
+  var first = getSafeTail_(grid, mySnake.head);
+  var win = findDirection_(mySnake.head, first);
+  var data = {
+    move: win, // one of: ["north", "east", "south", "west"]
+    taunt: config.snake.taunt.move
+  };
+
+  return res.json(data);
+
 });
 
 var server = app.listen(app.get('port'), function () {
