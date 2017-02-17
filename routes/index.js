@@ -56,6 +56,15 @@ router.post(config.routes.move, function (req, res) {
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length){
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
+
+    if (foodToGetPos !== -1 ) {
+      var start = {
+        head: closestFoodPaths[foodToGetPos][1]
+      };
+      var safeToTail = ai.getSafeTail(grid.clone(), mySnake.tail);
+      var toTail = ai.shortestPath(start, safeToTail, grid.clone());
+      if (toTail.length < 1) foodToGetPos = -1;
+    }
   }
 
   // //Can't reach any food faster than others
