@@ -76,6 +76,7 @@ app.use(function (err, req, res, next) {
     taunt: config.snake.taunt.move
   };
 
+  process.exit();
   return res.json(data);
 
 });
