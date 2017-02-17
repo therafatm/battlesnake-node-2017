@@ -88,18 +88,18 @@ var markEnemySides_ = function(head, grid) {
     if (grid.isInside(x-1,y)) {
       grid.setWalkableAt(x-1,y,false);
     }
-    if (grid.isInside(x+1,y+1)) {
-      grid.setWalkableAt(x+1, y+1,false);
-    }
-    if (grid.isInside(x-1,y-1)) {
-      grid.setWalkableAt(x-1,y-1,false);
-    }
-    if (grid.isInside(x+1,y-1)) {
-      grid.setWalkableAt(x+1,y-1,false);
-    }
-    if (grid.isInside(x-1,y+1)) {
-      grid.setWalkableAt(x-1,y+1,false);
-    }
+    // if (grid.isInside(x+1,y+1)) {
+    //   grid.setWalkableAt(x+1, y+1,false);
+    // }
+    // if (grid.isInside(x-1,y-1)) {
+    //   grid.setWalkableAt(x-1,y-1,false);
+    // }
+    // if (grid.isInside(x+1,y-1)) {
+    //   grid.setWalkableAt(x+1,y-1,false);
+    // }
+    // if (grid.isInside(x-1,y+1)) {
+    //   grid.setWalkableAt(x-1,y+1,false);
+    // }
 
 }
 
@@ -136,8 +136,6 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 
 // returns -1 if no best path exists
 var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
-
-
 
     var posChanged = false;
     for(var i = 0; i < closestFoodInOrder.length; i++){
@@ -192,23 +190,26 @@ var goToCentre_ = function(mySnake, gridCopy){
     var width = gridCopy.width;
     var height = gridCopy.height;
     var centre = [ Math.round(width/2), Math.round(height/2) ];
-    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/5));
-    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/5));
-    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/5));
-    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/5));
+    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/3));
+    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/3));
+    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
+    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
 
 
     //find safe spot in centre
     for(var i = xmin; i <= xmax; i++){
         for(var j = ymin; j <= ymax; j++){
             if(gridCopy.isWalkableAt(i,j)){
-                return [i,j];
+                var toCenter = shortestPath_(mySnake, [i,j], gridCopy.clone());
+                if(toCenter.length>1) return toCenter;                
             }
         } 
     }
 
     console.log("No space in centre found.");
-    return[0,0];
+    var cornerPath = checkForEmptyCorners(gridCopy, mySnakeCopy);
+    return cornerPath;
+    //if no corner path, idk what to do
 }
 
 var findSafeZones_ = function(mySnake, gridCopy) {
@@ -310,87 +311,148 @@ function BFSMarking(grid, i, j, n, m) {
 function withinCentre_(x,y,width, height, mySnake){
 
     var centre = [ Math.round(width/2), Math.round(height/2) ];
-    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/5));
-    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/5));
-    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/5));
-    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/5));
+    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/3));
+    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/3));
+    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
+    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
 
     return x <= xmax && x >= xmin && y <= ymax && y >= ymin;
 }
 
-function getSafeTail_(grid, tail) {
+
+function getSafeTail_(mySnake, grid, tail) {
+
     var x = tail[0];
     var y = tail[1];
 
-    if (grid.isInside(x,y+1) && grid.isWalkableAt(x,y+1)) {
-       return [x,y+1];
-    } else if (grid.isInside(x,y-1) && grid.isWalkableAt(x,y-1)) {
-      return [x,y-1];
-    } else if (grid.isInside(x+1,y) && grid.isWalkableAt(x+1,y))  {
-      return [x+1,y];
-    } else if (grid.isInside(x-1,y) && grid.isWalkableAt(x-1,y)) {
-      return [x-1,y];
+    if (grid.isInside(x,y+2) && grid.isWalkableAt(x,y+2)) {
+        var toTail = shortestPath_(mySnake, [x,y+2], grid.clone());
+        if(toTail.length>1) return toTail;
+    }
+
+    if (grid.isInside(x,y-2) && grid.isWalkableAt(x,y-2)) {
+        var toTail = shortestPath_(mySnake, [x,y-2], grid.clone());
+        if(toTail.length>1) return toTail;
+    }
+
+    if (grid.isInside(x+2,y) && grid.isWalkableAt(x+2,y))  {
+        var toTail = shortestPath_(mySnake, [x+2,y], grid.clone());
+        if(toTail.length>1) return toTail;
+    }
+
+    if (grid.isInside(x-2,y) && grid.isWalkableAt(x-2,y)) {
+        var toTail = shortestPath_(mySnake, [x-2,y], grid.clone());
+        if(toTail.length>1) return toTail;
     }
 
     //Edge case??
-    return [0,0];
+    console.log("No safe path to tail found.");
+    return [];
 }
 
-function checkForEmptyCorners(grid){
+function checkForEmptyCorners(grid, mySnake){
 
     if(grid.isWalkableAt(0,0)){
-        return [0,0];
+        var toCorner = shortestPath_(mySnake, [0,0], grid.clone());
+        if(toCorner.length>1) {
+            console.log("Sending path to corner 0,0");
+            console.log(toCorner);
+            return toCorner;
+        }
     }
     else if(grid.isWalkableAt(grid.width-1,0)){
-        return [grid.width-1, 0];
+        var toCorner = shortestPath_(mySnake, [grid.width-1, 0], grid.clone());
+        if(toCorner.length>1) {
+            console.log("Sending path to corner width,0");
+          console.log(toCorner);
+            return toCorner;
+        }
     }
     else if(grid.isWalkableAt(0, grid.height-1)){
-        return [0, grid.height-1]
+        var toCorner = shortestPath_(mySnake, [0, grid.height-1], grid.clone());
+        if(toCorner.length>1) {
+            console.log("Sending path to corner hieght,0");
+            console.log(toCorner);
+            return toCorner;
+        }   
     }
     else if(grid.isWalkableAt(grid.width-1, grid.height-1)){
-        return [grid.width - 1, grid.height -1];
+        var toCorner = shortestPath_(mySnake, [grid.width-1, grid.height-1], grid.clone());
+        if(toCorner.length>1) {
+            console.log("Sending path to corner width,height");
+            console.log(toCorner);    
+            return toCorner;
+        }    
     }
 
-    else return [Math.round(grid.width/2) , Math.round(grid.height/2) ];
+    else {
+
+        console.log("No corners found. No path to tail found.");
+        return [[]]
+    };
 }
 
 function nextStepTail_(mySnake, grid){
-    var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
-    var first;
-    for (var i = 0; i<5; i++){
-        mySnakeCopy.coords.pop();
-        mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
-        var path = goToTail_(mySnakeCopy, grid);
-        if (first === undefined) {
-            first = path;
+    var gridCopy = grid.clone();
+    // var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
+    // var first;
+    // for (var i = 0; i<5; i++){
+    //     var t = mySnakeCopy.coords.pop();
+    //     gridCopy.setWalkableAt(t[0], t[1], true);
+    //     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
+
+    //     var path = goToTail_(mySnakeCopy, gridCopy);
+    //     if (first === undefined) {
+    //         first = path;
+    //     }
+    //     if (path.length > 1) {
+    //         mySnakeCopy.coords.unshift(path[1]);
+    //         mySnakeCopy.head = path[1];
+    //         gridCopy.setWalkableAt(path[1][0], path[1][1], false);
+    //     } else {
+    //         var first = checkForEmptyCorners(grid, mySnake);
+    //         return findDirection_(mySnake.head, first[1]);
+    //     }
+    // }
+
+
+    var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
+
+    console.log("TAILPATH IN nextStepTail_:");
+    console.log(tailPath);
+    if(canReturnFromPoint_(mySnake, gridCopy, tailPath)){
+        return findDirection_(mySnake.head, tailPath[1]);
+    } else {
+        var cornerPath = checkForEmptyCorners(gridCopy, mySnake);
+        if(cornerPath && cornerPath.length > 2){
+            return findDirection_(mySnake.head, cornerPath[1]); 
         }
-        if (path.length > 1) {
-            mySnakeCopy.coords.unshift(path[1]);
-            mySnakeCopy.head = path[1];
-        } else {
-           first = shortestPath_(mySnake, [0,0], grid.clone());   
-           if(first.length <= 1){
-                var first = getSafeTail_(grid, mySnake.head);
-                return findDirection_(mySnake.head, first);
-           }     
-           break;
+        else {
+            if(tailPath && tailPath.length >= 1){
+                return findDirection_(mySnake.head, tailPath[1]);
+            }
         }
     }
-    return findDirection_(mySnake.head, first[1]);
 }
 
-function canReturnFromFood_(mySnake, grid, foodPath) {
+function canReturnFromPoint_(mySnake, grid, foodPath) {
     console.log("CAN RETURN FROM FOOD");
+    var gridCopy = grid.clone();
     var foodPathCopy = JSON.parse(JSON.stringify(foodPath));
     var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
     for (var i = 1; i < foodPathCopy.length; i++) {
-        mySnakeCopy.coords.pop();
+        var tail = mySnakeCopy.coords.pop();
+        gridCopy.setWalkableAt(tail[0], tail[1], true);
         mySnakeCopy.coords.unshift(foodPathCopy[i]);
+        gridCopy.setWalkableAt(foodPathCopy[i][0], foodPathCopy[i][1], true);
     }
+
     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
     mySnakeCopy.head = mySnakeCopy.coords[0];
-    var pathToTail = goToTail_(mySnakeCopy, grid.clone());
-    if (pathToTail.length > 1) {
+    var pathToTail = goToTail_(mySnakeCopy, gridCopy);
+    console.log(pathToTail);
+    var pathToCorner = checkForEmptyCorners(gridCopy, mySnake);
+    if (pathToTail && pathToTail.length > 3 && pathToCorner && pathToCorner.length > 1) {
         console.log("YES, I CAN")
         return true;
     } else {
@@ -400,13 +462,18 @@ function canReturnFromFood_(mySnake, grid, foodPath) {
 }
 
 function goToTail_(mySnake, grid) {
-    var safeToTail = getSafeTail_(grid.clone(), mySnake.tail);
-    safeToTail = getSafeTail_(grid.clone(), safeToTail);
-    var toTail = shortestPath_(mySnake, safeToTail, grid.clone());        
-    console.log("Safe to tail:");
-    console.log(safeToTail);
-    console.log(toTail);
-    return toTail;
+    var safeToTailPath = getSafeTail_(mySnake, grid.clone(), mySnake.tail);
+    if(safeToTailPath.length <= 2){
+        safeToTailPath = checkForEmptyCorners(grid, mySnake);
+        console.log("Corner Path found:");
+    }
+
+    else{
+        console.log("Safe to tail path found:");
+    }
+
+    console.log(safeToTailPath);
+    return safeToTailPath;
 }
 
 var api = {
@@ -422,7 +489,7 @@ var api = {
   goToCentre : goToCentre_,
   goToTail : goToTail_,
   nextStepTail : nextStepTail_,
-  canReturnFromFood : canReturnFromFood_
+  canReturnFromPoint : canReturnFromPoint_
 };
 
 module.exports = api;

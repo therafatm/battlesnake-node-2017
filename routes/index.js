@@ -51,27 +51,28 @@ router.post(config.routes.move, function (req, res) {
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
   // find closest food list -- args(foodArray, mySnake, gridCopy)
   console.log("My Snake");
-  console.log(mySnake);
+  //console.log(mySnake);
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length){
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
 
     console.log("Food to get pos before:");
-    console.log(foodToGetPos);
+    //console.log(foodToGetPos);
 
     if (foodToGetPos !== -1 && mySnake.health >= 20) {
-      if (!ai.canReturnFromFood(mySnake, grid.clone(), closestFoodPaths[foodToGetPos])) {
+      if (!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodPaths[foodToGetPos])) {
         foodToGetPos = -1;
       }
     }
+    
     console.log("Food to get pos after:");
-    console.log(foodToGetPos);
+    //console.log(foodToGetPos);
 
-    console.dir(closestFoodPaths, {
-      depth: null,
-      colors: true
-    });
+    // console.dir(closestFoodPaths, {
+    //   depth: null,
+    //   colors: true
+    // });
 
   }
 
@@ -81,17 +82,14 @@ router.post(config.routes.move, function (req, res) {
     console.log("SAFE MODE");
 
     //if not at centre, go to centre
-    if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake) ){
+    if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake)){
       console.log("im within centre");
-      var centrePoint = ai.goToCentre(mySnake, grid);
-      console.log(centrePoint);
-      var shortestPathToCentre = ai.shortestPath(mySnake, centrePoint, grid.clone());
+      var shortestPathToCentre = ai.goToCentre(mySnake, grid);
 
       if (shortestPathToCentre.length > 1) {
-        var safeToTail = ai.getSafeTail(grid, mySnake.tail);
-        var pathToTail = ai.shortestPath({head: shortestPathToCentre[1]}, safeToTail, grid.clone());
+
         // can Return from centre
-        if (ai.canReturnFromFood(mySnake, grid.clone(), pathToTail)) {      
+        if (ai.canReturnFromPoint(mySnake, grid.clone(), shortestPathToCentre)) {      
           win = ai.findDirection(mySnake.head, shortestPathToCentre[1]);
         }
         //no path to tail from next pos to centre 
@@ -99,7 +97,6 @@ router.post(config.routes.move, function (req, res) {
           console.log("no path to tail from next pos to centre");
           win = ai.nextStepTail(mySnake, grid);
         }
-
       } else {
         // no path to centre
         console.log("no path to centre. following tail.");        
@@ -116,7 +113,7 @@ router.post(config.routes.move, function (req, res) {
     //TODO: GO TOWARDS FOOD
     var foodToGet = closestFoodPaths[foodToGetPos];
     console.log("Food to get:")
-    console.log(foodToGet);
+    //console.log(foodToGet);
     win = ai.findDirection(mySnake.head, foodToGet[1]);
   }
 
