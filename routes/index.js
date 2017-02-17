@@ -40,7 +40,7 @@ router.post(config.routes.move, function (req, res) {
   var win = 'north';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
-  var mySnake = {};
+  var mySnake = {coords: []};
   mySnake.snakeId = body.you;
   var foodArray = body.food;
   var foodPath;
@@ -61,31 +61,45 @@ router.post(config.routes.move, function (req, res) {
       var start = {
         head: closestFoodPaths[foodToGetPos][1]
       };
-      var safeToTail = ai.getSafeTail(grid.clone(), mySnake.tail);
+      var safeToTail = ai.getSafeTail(grid, mySnake.tail);
       var toTail = ai.shortestPath(start, safeToTail, grid.clone());
       if (toTail.length < 1) foodToGetPos = -1;
     }
   }
 
-  // //Can't reach any food faster than others
+  //Can't reach any food faster than others
   if(closestFoodPaths.length === 0 || foodToGetPos === -1){
     //TODO: GO INTO SAFE MODE
     console.log("SAFE MODE");
 
     //if not at centre, go to centre
-    if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], (body.width-1)/2, (body.height-1)/2)){
+    if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake) ){
       console.log("im within centre");
       var centrePoint = ai.goToCentre(mySnake, grid);
       console.log(centrePoint);
-      var shortestPath = ai.shortestPath(mySnake, centrePoint, grid.clone());
-      if (shortestPath.length>1) {
-        win = ai.findDirection(mySnake.head, shortestPath[1]);
+      var shortestPathToCentre = ai.shortestPath(mySnake, centrePoint, grid.clone());
+
+      if (shortestPathToCentre.length > 1) {
+        var safeToTail = ai.getSafeTail(grid, mySnake.tail);
+        var pathToTail = ai.shortestPath({head: shortestPathToCentre[1]}, safeToTail, grid.clone());        
+        if(pathToTail.length > 1){
+          win = ai.findDirection(mySnake.head, shortestPathToCentre[1]);
+        }
+        //no path to tail from next pos to centre 
+        else {
+          console.log("no path to tail from next pos to centre");
+          win = ai.nextStep(mySnake, grid);
+        }
+
       } else {
-        win = ai.goToTail(mySnake, grid);
+        // no path to centre
+        console.log("no path to tail from centre");        
+        win = ai.nextStep(mySnake, grid);
       }
     }
     else {
-      win = ai.goToTail(mySnake, grid);
+      console.log("im not within centre, following tail");      
+      win = ai.nextStep(mySnake, grid);
     }
   }
 

@@ -43,9 +43,13 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
             mySnake.head = s.coords[0];
             if(s.coords.length > 1){
                 mySnake.tail = s.coords[s.coords.length - 1];
+                s.coords.forEach( (c) => {
+                    mySnake.coords.push(c);
+                });
             }
             mySnake.health = s.health_points;
             mySnake.len = s.coords.length;
+
 		}
 		else{
             isEnemy = true;
@@ -147,11 +151,12 @@ var goToCentre_ = function(mySnake, gridCopy){
 
     var width = gridCopy.width;
     var height = gridCopy.height;
-    var centre = [ Math.round((width -1)/2), Math.round((height-1)/2)];
-    var xmin = centre[0] - 2;
-    var xmax = centre[0] + 2;
-    var ymin = centre[1] - 2;
-    var ymax = centre[1] + 2;
+    var centre = [ Math.round(width/2), Math.round(height/2) ];
+    var xmin = centre[0] - Math.max(Math.round(mySnake.len/3),2);
+    var xmax = centre[0] + Math.max(Math.round(mySnake.len/3),2);
+    var ymin = centre[1] - Math.max(Math.round(mySnake.len/3),2);
+    var ymax = centre[1] + Math.max(Math.round(mySnake.len/3),2);
+
 
     //find safe spot in centre
     for(var i = xmin; i <= xmax; i++){
@@ -262,13 +267,13 @@ function BFSMarking(grid, i, j, n, m) {
     return radius;   
 }
 
-function withinCentre_(x,y,width, height){
+function withinCentre_(x,y,width, height, mySnake){
 
-    var centre = [ Math.round(width), Math.round(height) ];
-    var xmin = centre[0] - 2;
-    var xmax = centre[0] + 2;
-    var ymin = centre[1] - 2;
-    var ymax = centre[1] + 2;
+    var centre = [ Math.round(width/2), Math.round(height/2) ];
+    var xmin = centre[0] - Math.max(Math.round(mySnake.len/3),2);
+    var xmax = centre[0] + Math.max(Math.round(mySnake.len/3),2);
+    var ymin = centre[1] - Math.max(Math.round(mySnake.len/3),2);
+    var ymax = centre[1] + Math.max(Math.round(mySnake.len/3),2);
 
     return x <= xmax && x >= xmin && y <= ymax && y >= ymin;
 }
@@ -291,14 +296,39 @@ function getSafeTail_(grid, tail) {
     return [0,0];
 }
 
+function nextStep_(mySnake, grid){
+    var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
+    var first;
+    for (var i = 0; i<20; i++){
+        mySnakeCopy.coords.pop();
+        mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
+        var path = goToTail_(mySnakeCopy, grid) ;
+        if (first === undefined) {
+            first = path;
+        }
+        if (path.length > 1) {
+            mySnakeCopy.coords.unshift(path[1]);
+            mySnakeCopy.head = path[1];
+        } else {
+           first = shortestPath_(mySnake, [0,0], grid.clone());        
+            console.assert(first.length !== 0, "No path to 00");
+           break;
+        }
+    }
+    return findDirection_(mySnake.head, first[1]);
+}
+
 function goToTail_(mySnake, grid) {
-    console.log("im not within centre, following tail");      
     var safeToTail = getSafeTail_(grid.clone(), mySnake.tail);
     safeToTail = getSafeTail_(grid.clone(), safeToTail);
     var toTail = shortestPath_(mySnake, safeToTail, grid.clone());        
     console.log("Safe to tail:");
     console.log(safeToTail);
-    return findDirection_(mySnake.head, toTail[1]);
+    console.log(toTail);
+    if (toTail.length < 1) {
+        toTail = shortestPath_(mySnake, [0,0], grid.clone());        
+    }
+    return toTail;
 }
 
 var api = {
@@ -312,7 +342,8 @@ var api = {
   getSafeTail : getSafeTail_,
   withinCentre : withinCentre_,
   goToCentre : goToCentre_,
-  goToTail : goToTail_
+  goToTail : goToTail_,
+  nextStep : nextStep_
 };
 
 module.exports = api;
