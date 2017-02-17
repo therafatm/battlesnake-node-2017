@@ -73,6 +73,7 @@ router.post(config.routes.move, function (req, res) {
     console.log("SAFE MODE");
 
     var safeToTail = ai.getSafeTail(grid.clone(), mySnake.tail);
+    safeToTail = ai.getSafeTail(grid.clone(), safeToTail);
     console.log("Safe tail Pos");
     console.log(safeToTail);
     var toTail = ai.shortestPath(mySnake, safeToTail, grid.clone());
@@ -85,7 +86,14 @@ router.post(config.routes.move, function (req, res) {
     //TODO: HANDLE NO PATH TO TAIL
       var safeZonesInOrder = ai.findSafeZones(mySnake, grid);
       var bestSafeZoneIndex = ai.findBestSafeZone(mySnake, safeZonesInOrder);
-      win = ai.findDirection(mySnake.head, safeZonesInOrder[bestSafeZoneIndex].path[1]);
+      if(bestSafeZoneIndex >= 0){
+        win = ai.findDirection(mySnake.head, safeZonesInOrder[bestSafeZoneIndex].path[1]);
+      }
+
+      else{
+        console.log("this is some weird shit.");
+      }
+
       console.error("Win: ");
       console.log(win);
 
@@ -95,7 +103,27 @@ router.post(config.routes.move, function (req, res) {
   else{
     //TODO: GO TOWARDS FOOD
     var foodToGet = closestFoodPaths[foodToGetPos];
-    win = ai.findDirection(mySnake.head, foodToGet[1]);
+    var safeToTail = ai.getSafeTail(grid.clone(), mySnake.tail);
+    safeToTail = ai.getSafeTail(grid.clone(), safeToTail);    
+    var toTail = ai.shortestPath({head: foodToGet[1]}, safeToTail, grid.clone());
+    if(toTail.length){
+      //if path to tail from next block, go for food
+      win = ai.findDirection(mySnake.head, foodToGet[1]);
+    }
+    else{
+      
+      toTail = ai.shortestPath(mySnake, safeToTail, grid.clone());
+      if(toTail.length){
+        win = ai.findDirection(mySnake.head, toTail[1]);
+      }
+      else{
+        console.log("oh fugg");
+      }
+    }
+
+    console.log("Safe tail Pos");
+    console.log(safeToTail);
+
   }
 
   // Response data
