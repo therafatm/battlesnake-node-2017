@@ -57,10 +57,11 @@ router.post(config.routes.move, function (req, res) {
   if(closestFoodPaths.length && enemySnakes.head.length){
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
 
-    if (foodToGetPos !== -1 ) {
+    if (foodToGetPos !== -1 && mySnake.health >= 20) {
       var start = {
         head: closestFoodPaths[foodToGetPos][1]
-      };
+      }; 
+
       var safeToTail = ai.getSafeTail(grid, mySnake.tail);
       var toTail = ai.shortestPath(start, safeToTail, grid.clone());
       if (toTail.length < 1) foodToGetPos = -1;

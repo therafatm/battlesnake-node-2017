@@ -105,15 +105,23 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 // returns -1 if no best path exists
 var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
 
+
+
     var posChanged = false;
     for(var i = 0; i < closestFoodInOrder.length; i++){
         for(var j = 0; j < enemySnakes.head.length; j++) {
             var snakehead = enemySnakes.head[j];
             //distance between enemy snake to current best food
-            var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
-            if((distance < closestFoodInOrder[i].length) ||
-                (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
-                //TODO: eat snake
+            if(mySnake.health >= 20){
+                var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
+                if((distance < closestFoodInOrder[i].length) ||
+                    (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
+                    //TODO: eat snake
+                    posChanged = true;
+                    break;
+                }                
+            }
+            else {
                 posChanged = true;
                 break;
             }
@@ -152,10 +160,10 @@ var goToCentre_ = function(mySnake, gridCopy){
     var width = gridCopy.width;
     var height = gridCopy.height;
     var centre = [ Math.round(width/2), Math.round(height/2) ];
-    var xmin = centre[0] - Math.max(Math.round(mySnake.len/3),2);
-    var xmax = centre[0] + Math.max(Math.round(mySnake.len/3),2);
-    var ymin = centre[1] - Math.max(Math.round(mySnake.len/3),2);
-    var ymax = centre[1] + Math.max(Math.round(mySnake.len/3),2);
+    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), (width-4));
+    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), (width-4));
+    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), (height-4));
+    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), (height-4));
 
 
     //find safe spot in centre
@@ -270,10 +278,10 @@ function BFSMarking(grid, i, j, n, m) {
 function withinCentre_(x,y,width, height, mySnake){
 
     var centre = [ Math.round(width/2), Math.round(height/2) ];
-    var xmin = centre[0] - Math.max(Math.round(mySnake.len/3),2);
-    var xmax = centre[0] + Math.max(Math.round(mySnake.len/3),2);
-    var ymin = centre[1] - Math.max(Math.round(mySnake.len/3),2);
-    var ymax = centre[1] + Math.max(Math.round(mySnake.len/3),2);
+    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), (width-4));
+    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), (width-4));
+    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), (height-4));
+    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), (height-4));
 
     return x <= xmax && x >= xmin && y <= ymax && y >= ymin;
 }
@@ -299,7 +307,7 @@ function getSafeTail_(grid, tail) {
 function nextStep_(mySnake, grid){
     var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
     var first;
-    for (var i = 0; i<20; i++){
+    for (var i = 0; i<10; i++){
         mySnakeCopy.coords.pop();
         mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
         var path = goToTail_(mySnakeCopy, grid) ;
@@ -310,8 +318,11 @@ function nextStep_(mySnake, grid){
             mySnakeCopy.coords.unshift(path[1]);
             mySnakeCopy.head = path[1];
         } else {
-           first = shortestPath_(mySnake, [0,0], grid.clone());        
-            console.assert(first.length !== 0, "No path to 00");
+           first = shortestPath_(mySnake, [0,0], grid.clone());   
+           if(first.length <= 1){
+                var first = getSafeTail_(grid, mySnake.head);
+                return findDirection_(mySnake.head, first);
+           }     
            break;
         }
     }
