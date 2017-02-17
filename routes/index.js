@@ -60,7 +60,7 @@ router.post(config.routes.move, function (req, res) {
     if (foodToGetPos !== -1 && mySnake.health >= 20) {
       var start = {
         head: closestFoodPaths[foodToGetPos][1]
-      }; 
+      };
 
       var safeToTail = ai.getSafeTail(grid, mySnake.tail);
       var toTail = ai.shortestPath(start, safeToTail, grid.clone());
@@ -89,18 +89,18 @@ router.post(config.routes.move, function (req, res) {
         //no path to tail from next pos to centre 
         else {
           console.log("no path to tail from next pos to centre");
-          win = ai.nextStep(mySnake, grid);
+          win = ai.nextStepTail(mySnake, grid);
         }
 
       } else {
         // no path to centre
         console.log("no path to tail from centre");        
-        win = ai.nextStep(mySnake, grid);
+        win = ai.nextStepTail(mySnake, grid);
       }
     }
     else {
       console.log("im not within centre, following tail");      
-      win = ai.nextStep(mySnake, grid);
+      win = ai.nextStepTail(mySnake, grid);
     }
   }
 

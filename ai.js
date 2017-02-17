@@ -54,6 +54,7 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 		else{
             isEnemy = true;
             enemySnakes.head.push(s.coords[0]);
+            markEnemySides_(s.coords[0],grid);
             enemySnakes.len.push(s.coords.length);
 		}
 
@@ -70,6 +71,37 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 		});
 	});
 };
+
+var markEnemySides_ = function(head, grid) {
+    var x = head[0];
+    var y = head[1];
+
+    if (grid.isInside(x,y+1)) {
+        grid.setWalkableAt(x,y+1, false);
+    }
+    if (grid.isInside(x,y-1)) {
+      grid.setWalkableAt(x,y-1, false);
+    }
+    if (grid.isInside(x+1,y))  {
+      grid.setWalkableAt(x+1,y,false);
+    }
+    if (grid.isInside(x-1,y)) {
+      grid.setWalkableAt(x-1,y,false);
+    }
+    if (grid.isInside(x+1,y+1)) {
+      grid.setWalkableAt(x+1, y+1,false);
+    }
+    if (grid.isInside(x-1,y-1)) {
+      grid.setWalkableAt(x-1,y-1,false);
+    }
+    if (grid.isInside(x+1,y-1)) {
+      grid.setWalkableAt(x+1,y-1,false);
+    }
+    if (grid.isInside(x-1,y+1)) {
+      grid.setWalkableAt(x-1,y+1,false);
+    }
+
+}
 
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
@@ -304,13 +336,31 @@ function getSafeTail_(grid, tail) {
     return [0,0];
 }
 
-function nextStep_(mySnake, grid){
+function checkForEmptyCorners(grid){
+
+    if(grid.isWalkableAt(0,0)){
+        return [0,0];
+    }
+    else if(grid.isWalkableAt(grid.width-1,0)){
+        return [grid.width-1, 0];
+    }
+    else if(grid.isWalkableAt(0, grid.height-1)){
+        return [0, grid.height-1]
+    }
+    else if(grid.isWalkableAt(grid.width-1, grid.height-1)){
+        return [grid.width - 1, grid.height -1];
+    }
+
+    else return [Math.round(grid.width/2) , Math.round(grid.height/2) ];
+}
+
+function nextStepTail_(mySnake, grid){
     var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
     var first;
-    for (var i = 0; i<10; i++){
+    for (var i = 0; i<20; i++){
         mySnakeCopy.coords.pop();
         mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
-        var path = goToTail_(mySnakeCopy, grid) ;
+        var path = goToTail_(mySnakeCopy, grid);
         if (first === undefined) {
             first = path;
         }
@@ -336,9 +386,6 @@ function goToTail_(mySnake, grid) {
     console.log("Safe to tail:");
     console.log(safeToTail);
     console.log(toTail);
-    if (toTail.length < 1) {
-        toTail = shortestPath_(mySnake, [0,0], grid.clone());        
-    }
     return toTail;
 }
 
@@ -354,7 +401,7 @@ var api = {
   withinCentre : withinCentre_,
   goToCentre : goToCentre_,
   goToTail : goToTail_,
-  nextStep : nextStep_
+  nextStepTail : nextStepTail_
 };
 
 module.exports = api;
