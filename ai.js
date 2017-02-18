@@ -8,7 +8,6 @@ console.log(bf);
 
 let currentEnemySnakes = new bf.BloomFilter();
 
-
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
     console.log("start:");
@@ -88,18 +87,18 @@ var markEnemySides_ = function(head, grid) {
     if (grid.isInside(x-1,y)) {
       grid.setWalkableAt(x-1,y,false);
     }
-    // if (grid.isInside(x+1,y+1)) {
-    //   grid.setWalkableAt(x+1, y+1,false);
-    // }
-    // if (grid.isInside(x-1,y-1)) {
-    //   grid.setWalkableAt(x-1,y-1,false);
-    // }
-    // if (grid.isInside(x+1,y-1)) {
-    //   grid.setWalkableAt(x+1,y-1,false);
-    // }
-    // if (grid.isInside(x-1,y+1)) {
-    //   grid.setWalkableAt(x-1,y+1,false);
-    // }
+    if (grid.isInside(x+1,y+1)) {
+      grid.setWalkableAt(x+1, y+1,false);
+    }
+    if (grid.isInside(x-1,y-1)) {
+      grid.setWalkableAt(x-1,y-1,false);
+    }
+    if (grid.isInside(x+1,y-1)) {
+      grid.setWalkableAt(x+1,y-1,false);
+    }
+    if (grid.isInside(x-1,y+1)) {
+      grid.setWalkableAt(x-1,y+1,false);
+    }
 
 }
 
@@ -322,6 +321,10 @@ function withinCentre_(x,y,width, height, mySnake){
 
 function getSafeTail_(mySnake, grid, tail) {
 
+    if(!tail){
+        checkForEmptyCorners(grid, mySnake);
+    }
+
     var x = tail[0];
     var y = tail[1];
 
@@ -351,6 +354,8 @@ function getSafeTail_(mySnake, grid, tail) {
 }
 
 function checkForEmptyCorners(grid, mySnake){
+
+    if(!grid){console.log("grid is not valid.")} 
 
     if(grid.isWalkableAt(0,0)){
         var toCorner = shortestPath_(mySnake, [0,0], grid.clone());
@@ -415,12 +420,11 @@ function nextStepTail_(mySnake, grid){
     //     }
     // }
 
-
     var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
 
     console.log("TAILPATH IN nextStepTail_:");
     console.log(tailPath);
-    if(canReturnFromPoint_(mySnake, gridCopy, tailPath)){
+    if( tailPath.length > 2 && canReturnFromPoint_(mySnake, gridCopy, tailPath)){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
         var cornerPath = checkForEmptyCorners(gridCopy, mySnake);
