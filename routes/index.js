@@ -40,7 +40,7 @@ router.post(config.routes.move, function (req, res) {
   var win = 'north';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
-  var mySnake = {coords: []};
+  var mySnake = {coords: [], constrictedGrid: {}};
   mySnake.snakeId = body.you;
   var foodArray = body.food;
   var foodPath;
@@ -49,9 +49,14 @@ router.post(config.routes.move, function (req, res) {
 
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
+
+  if(mySnake.len >= 20){
+    mySnake.constrictedGrid = ai.makeConstrictedGrid(grid.clone(), mySnake);
+
+  }
   // find closest food list -- args(foodArray, mySnake, gridCopy)
   console.log("My Snake");
-  //console.log(mySnake);
+  console.log(mySnake);
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length){
@@ -86,7 +91,7 @@ router.post(config.routes.move, function (req, res) {
       console.log("im within centre");
       var shortestPathToCentre = ai.goToCentre(mySnake, grid);
 
-      if (shortestPathToCentre.length > 1) {
+      if (shortestPathToCentre && shortestPathToCentre.length > 1) {
 
         // can Return from centre
         if (ai.canReturnFromPoint(mySnake, grid.clone(), shortestPathToCentre)) {      

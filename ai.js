@@ -32,12 +32,45 @@ var findDirection_ = function(start, dest) {
     }
 };
 
+var setSnakeBounds = function(mySnake, coords){
+
+    if(mySnake.leftBound){
+        mySnake.leftBound = mySnake.leftBound < coords[0] ? mySnake.leftBound : coords[0];
+    }
+
+    else{
+        mySnake.leftBound = coords[0];
+    }
+
+    if(mySnake.rightBound){
+        mySnake.rightBound = mySnake.rightBound > coords[0] ? mySnake.rightBound : coords[0];
+    }
+
+    else{
+        mySnake.rightBound = coords[0];
+    }
+
+    if(mySnake.topBound){
+        mySnake.topBound = mySnake.topBound < coords[1] ? mySnake.topBound : coords[1];
+    }
+
+    else{
+        mySnake.topBound = coords[1];
+    }
+
+    if(mySnake.bottomBound){
+        mySnake.bottomBound = mySnake.bottomBound > coords[1] ? mySnake.bottomBound : coords[1];
+    }
+
+    else{
+        mySnake.bottomBound = coords[1];
+    }
+
+}
+
 var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 
-    currentEnemySnakes = new bf.BloomFilter();
-    var isEnemy = false;
 	snakes.forEach((s)=>{
-        isEnemy = false;
 		if(mySnake.snakeId === s.id){
 			// find our snake
             mySnake.head = s.coords[0];
@@ -45,6 +78,7 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
                 mySnake.tail = s.coords[s.coords.length - 1];
                 s.coords.forEach( (c) => {
                     mySnake.coords.push(c);
+                    //setSnakeBounds(mySnake, c);
                 });
             }
             mySnake.health = s.health_points;
@@ -52,7 +86,6 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 
 		}
 		else{
-            isEnemy = true;
             enemySnakes.head.push(s.coords[0]);
             markEnemySides_(s.coords[0],grid);
             enemySnakes.len.push(s.coords.length);
@@ -62,12 +95,8 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 		s.coords.forEach((pos)=>{
           if(grid === undefined){
             console.log("GRID IS UNDEFINED\n!");
-          }
+          }          
 		  grid.setWalkableAt(pos[0], pos[1], false);
-          if(isEnemy){
-              var posString = pos[0].toString() + "," + pos[1].toString()
-              currentEnemySnakes.add(posString);
-          }
 		});
 	});
 };
@@ -207,105 +236,80 @@ var goToCentre_ = function(mySnake, gridCopy){
     }
 
     console.log("No space in centre found.");
-    var cornerPath = checkForEmptyCorners(gridCopy, mySnakeCopy);
-    return cornerPath;
+    return [];
     //if no corner path, idk what to do
 }
 
-var findSafeZones_ = function(mySnake, gridCopy) {
+var findSafeInConstrictedGrid_ = function(mySnake) {
 
     var safeZones = [];
-    var count = 0;
-    var n = gridCopy.height;
-    if (n == 0) return -1;
-    var m = gridCopy.width;
-    for (var i = 0; i < n; i++){
-        for (var j = 0; j < m; j++){
-            if (gridCopy.isWalkableAt(i,j)) {
-                var radius = BFSMarking(gridCopy.clone(), i, j, n, m);
-                if(radius >= 1){
-                    safeZones.push({ pos: [i,j], radius: radius});
-                    j+= radius;
-                    i+= radius;
-                    break;
-                }
-            }
+    var gridCopy = mySnake.constrictedGrid.clone();
+
+    var findCorner = findFarthestCorner(mySnake);
+    var cornerMap = { "topRight" : [gridCopy.width-1, 0], 
+                      "topLeft" : [0, 0],
+                      "bottomLeft" : [0, gridCopy.height-1],
+                      "bottomRight" : [gridCopy.width-1, gridCopy.height-1]
+                    }
+
+    //do bfs until path to spot is found
+    var cornerToGo = cornerMap[findCorner];
+
+    var emptyCorners = BFSMarking(gridCopy.clone(), cornerToGo[0], cornerToGo[1]);
+
+    for(var i = 0; i < emptyCorners.length ; i++){
+        var path = shortestPath_(mySnake, emptyCorners[i], gridCopy.clone());
+
+        if(path.length >= 1 && canReturnFromPoint_(mySnake, gridCopy.clone(), path)){
+            return path;
         }
     }
 
-    if(safeZones.length === 0){
-        console.log("No safeZones found. Something wrong here.");
-    }
-
-    safeZones.sort((a,b)=>{
-        return a.radius - b.radius;
-    });
-
-    console.log(safeZones);
-    var reachableSafeZones = safeZones.filter( (safezone) => {
-        var path = shortestPath_(mySnake, safezone.pos, gridCopy.clone());
-        if(path.length){
-            safezone.path = path;
-            return true;
-        } 
-        else return false;
-    });
-
-    console.log("reachableSafeZones: \n");
-    console.log(reachableSafeZones);
-
-    return reachableSafeZones;
+    console.log("No reachable empty corners");
 };
 
 function BFSMarking(grid, i, j, n, m) {
-    var radius = 0;
     var queue = [];
-    var nodesAdded = 0;   // to account itself being counted for
-    var divider = 0;
-    var counter = 0;
-    var level = 1;
-    var toLevel = 0;
-
+    var emptySpaces = []
     var currentNode = grid.getNodeAt(i,j);
 
     queue.push(currentNode);
-    while(queue.length){
-
-        var oldCounter = counter;
+    while(queue.length || emptySpaces.length <= 4){
         var currentNode = queue.shift();
-        grid.setWalkableAt(currentNode.x, currentNode.y, false);
+        if(grid.isWalkableAt(currentNode.x, currentNode.y)){
+            emptySpaces.push([currentNode.x, currentNode.y]);
+            grid.setWalkableAt(currentNode.x, currentNode.y, false);
+        }
+
         var neighbours = grid.getNeighbors(currentNode, 2); // 2 because we dont want diagonal movement. check DiagonalMovement.js in pathfinding.js module
         for(var k = 0; k < neighbours.length; k++){
             var neighbour = neighbours[k];
-            var neighbourPosString = neighbour.x.toString() +  "," + neighbour.y.toString();
-            if(currentEnemySnakes.exists(neighbourPosString)){
-                return radius;
-            }
-
-            else{
-                if(grid.isWalkableAt(neighbour.x, neighbour.y)){
-                    nodesAdded++;    
-                    grid.setWalkableAt(neighbour.x, neighbour.y, false);
-                    queue.push(neighbour);
-                }
+            //assuming no one else is stuck inside me
+            if(grid.isWalkableAt(neighbour.x, neighbour.y)){
+                emptySpaces.push([neighbour.x, neighbour.y]);
+                grid.setWalkableAt(neighbour.x, neighbour.y, false);
+                queue.push(neighbour);
             }
         }
-        
-        if(counter >= (level * 4)){
-            level += 1;
-            divider += 4;
-
-            var shouldConsiderRadius = (counter/divider) - Math.floor(counter/divider);
-            if(shouldConsiderRadius === 0 || shouldConsiderRadius >= 0.8){
-                radius++;
-            }            
-        }
-
-        counter++
-        //perimeter increases by 4 every block of radius
     }
+    return emptySpaces;   
+}
 
-    return radius;   
+function findFarthestCorner(mySnake){
+
+    var topLeft = distance(mySnake.head, [mySnake.leftBound, mySnake.topBound]).toString();
+    var topRight = distance(mySnake.head, [mySnake.rightBound, mySnake.topBound]).toString();
+    var bottomLeft = distance(mySnake.head, [mySnake.leftBound, mySnake.bottomBound]).toString();
+    var bottomRight = distance(mySnake.head, [mySnake.rightBound, mySnake.bottomBound]).toString();
+
+    var map = { topLeft: "topLeft",
+                topRight : "topRight",
+                bottomLeft : "bottomLeft",
+                bottomRight : "bottomRight"};
+
+    var farthest = Math.max( ParseInt(topLeft), ParseInt(topRight), ParseInt(bottomRight), ParseInt(bottomLeft) );
+
+    return map[farthest.toString()]; 
 }
 
 function withinCentre_(x,y,width, height, mySnake){
@@ -420,20 +424,50 @@ function nextStepTail_(mySnake, grid){
 
     console.log("TAILPATH IN nextStepTail_:");
     console.log(tailPath);
-    if(canReturnFromPoint_(mySnake, gridCopy, tailPath)){
+    if(tailPath && canReturnFromPoint_(mySnake, gridCopy, tailPath)){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
         var cornerPath = checkForEmptyCorners(gridCopy, mySnake);
-        if(cornerPath && cornerPath.length > 2){
+        if(cornerPath && cornerPath.length >= 2){
             return findDirection_(mySnake.head, cornerPath[1]); 
         }
         else {
+
+            //I'm constricted
+            //find farthest corner from itself
+            var pathToGo = findSafeInConstrictedGrid_(mySnake);
+            if(pathToGo.length >= 1){
+                return findDirection_(mySnake.head, pathToGo[1]);
+            }
+            // handle constriction
             if(tailPath && tailPath.length >= 1){
                 return findDirection_(mySnake.head, tailPath[1]);
             }
         }
     }
 }
+
+var makeConstrictedGrid_ = function(grid, mySnake) {
+
+    console.log("Here");
+    var width = mySnake.rightBound - mySnake.leftBound + 1;
+    var height =  mySnake.bottomBound - mySnake.topBound + 1;
+    console.log(width);
+    console.log(height);
+
+    var newGrid = new pf.Grid(width, height);
+    var newNodes = new Array(height);
+
+    for (var i = 0; i < height; ++i) {
+        newNodes[i] = new Array(width);
+        for (var j = 0; j < width; ++j) {
+            newNodes[i][j] = new Node(j, i, grid.isWalkableAt(mySnake.bottomBound + i, mySnake.topBound + j));
+        }
+    }
+
+    newGrid.nodes = newNodes;
+    return newGrid;
+};
 
 function canReturnFromPoint_(mySnake, grid, foodPath) {
     console.log("CAN RETURN FROM FOOD");
@@ -477,19 +511,18 @@ function goToTail_(mySnake, grid) {
 }
 
 var api = {
-	initSelfGridSnakeHeads: initSelfGridSnakeHeads_,
-	shortestPath: shortestPath_,
-	findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
-	findBestFoodPathPos: findBestFoodPathPos_,
-	findDirection: findDirection_,
-  findSafeZones: findSafeZones_,
-  findBestSafeZone: findBestSafeZone_,
-  getSafeTail : getSafeTail_,
-  withinCentre : withinCentre_,
-  goToCentre : goToCentre_,
-  goToTail : goToTail_,
-  nextStepTail : nextStepTail_,
-  canReturnFromPoint : canReturnFromPoint_
+    initSelfGridSnakeHeads: initSelfGridSnakeHeads_,
+    shortestPath: shortestPath_,
+    findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
+    findBestFoodPathPos: findBestFoodPathPos_,
+    findDirection: findDirection_,
+    getSafeTail : getSafeTail_,
+    withinCentre : withinCentre_,
+    goToCentre : goToCentre_,
+    goToTail : goToTail_,
+    nextStepTail : nextStepTail_,
+    canReturnFromPoint : canReturnFromPoint_,
+    makeConstrictedGrid : makeConstrictedGrid_
 };
 
 module.exports = api;

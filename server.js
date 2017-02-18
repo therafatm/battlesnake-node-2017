@@ -55,10 +55,9 @@ app.use(function (err, req, res, next) {
 // 500 handler middleware, respond with JSON only
 app.use(function (err, req, res, next) {
 
-  console.log(err);
   console.log(err.stack);
-
   console.log("FAILED ALL MOVES. IN ERROR HANDLE.");
+  process.exit(0);
   // var body = req.body;
   // var enemySnakes = {head:[], len:[]};
   // var snakes = body.snakes;
