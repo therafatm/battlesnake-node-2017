@@ -638,8 +638,7 @@ var api = {
   goToCentre : goToCentre_,
   goToTail : goToTail_,
   nextStepTail : nextStepTail_,
-  canReturnFromPoint : canReturnFromPoint_,
-  amIConstricted : amIConstricted_
+  canReturnFromPoint : canReturnFromPoint_
 };
 
 module.exports = api;
