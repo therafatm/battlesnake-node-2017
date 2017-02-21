@@ -207,7 +207,7 @@ function BFSMarking(grid, i, j) {
     var currentNode = grid.getNodeAt(i,j);
 
     queue.push(currentNode);
-    while(queue.length || emptySpaces.length <= 4){
+    while(queue.length && emptySpaces.length <= 4){
         var currentNode = queue.shift();
         if(grid.isWalkableAt(currentNode.x, currentNode.y)){
             emptySpaces.push([currentNode.x, currentNode.y]);
@@ -289,23 +289,6 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
     return -1;
 };
 
-var findBestSafeZone_ = function(mySnake, safeZones){
-    console.log("Within reachable safe zones:\nSafeZones:");
-    console.log(safeZones);
-
-    for(var i = 0; i < safeZones.length; i++){
-        var distance = findDistance(mySnake.head, safeZones[i].pos);
-        if(distance != null || distance > 0){
-            console.log("distance:");
-            console.log(distance);
-            return i;
-        }
-    }
-
-    console.log("something wrong: -1\n");    
-    return -1;
-}
-
 function findDistance(start, destination){
     return ( Math.abs(start[0] - destination[0]) + Math.abs(start[1]-destination[1]) );
 };
@@ -337,102 +320,6 @@ var goToCentre_ = function(mySnake, gridCopy){
     //if no corner path, idk what to do
 }
 
-var findSafeZones_ = function(mySnake, gridCopy) {
-
-    var safeZones = [];
-    var count = 0;
-    var n = gridCopy.height;
-    if (n == 0) return -1;
-    var m = gridCopy.width;
-    for (var i = 0; i < n; i++){
-        for (var j = 0; j < m; j++){
-            if (gridCopy.isWalkableAt(i,j)) {
-                var radius = BFSMarking(gridCopy.clone(), i, j, n, m);
-                if(radius >= 1){
-                    safeZones.push({ pos: [i,j], radius: radius});
-                    j+= radius;
-                    i+= radius;
-                    break;
-                }
-            }
-        }
-    }
-
-    if(safeZones.length === 0){
-        console.log("No safeZones found. Something wrong here.");
-    }
-
-    safeZones.sort((a,b)=>{
-        return a.radius - b.radius;
-    });
-
-    console.log(safeZones);
-    var reachableSafeZones = safeZones.filter( (safezone) => {
-        var path = shortestPath_(mySnake, safezone.pos, gridCopy.clone());
-        if(path.length){
-            safezone.path = path;
-            return true;
-        } 
-        else return false;
-    });
-
-    console.log("reachableSafeZones: \n");
-    console.log(reachableSafeZones);
-
-    return reachableSafeZones;
-};
-
-function BFSMarking(grid, i, j, n, m) {
-    var radius = 0;
-    var queue = [];
-    var nodesAdded = 0;   // to account itself being counted for
-    var divider = 0;
-    var counter = 0;
-    var level = 1;
-    var toLevel = 0;
-
-    var currentNode = grid.getNodeAt(i,j);
-
-    queue.push(currentNode);
-    while(queue.length){
-
-        var oldCounter = counter;
-        var currentNode = queue.shift();
-        grid.setWalkableAt(currentNode.x, currentNode.y, false);
-        var neighbours = grid.getNeighbors(currentNode, 2); // 2 because we dont want diagonal movement. check DiagonalMovement.js in pathfinding.js module
-        for(var k = 0; k < neighbours.length; k++){
-            var neighbour = neighbours[k];
-            var neighbourPosString = neighbour.x.toString() +  "," + neighbour.y.toString();
-            if(currentEnemySnakes.exists(neighbourPosString)){
-                return radius;
-            }
-
-            else{
-                if(grid.isWalkableAt(neighbour.x, neighbour.y)){
-                    nodesAdded++;    
-                    grid.setWalkableAt(neighbour.x, neighbour.y, false);
-                    queue.push(neighbour);
-                }
-            }
-        }
-        
-        if(counter >= (level * 4)){
-            level += 1;
-            divider += 4;
-
-            var shouldConsiderRadius = (counter/divider) - Math.floor(counter/divider);
-            if(shouldConsiderRadius === 0 || shouldConsiderRadius >= 0.8){
-                radius++;
-            }            
-        }
-
-        counter++
-        //perimeter increases by 4 every block of radius
-    }
-
-    return radius;   
-}
-
 function withinCentre_(x,y,width, height, mySnake){
 
     var centre = [ Math.round(width/2), Math.round(height/2) ];
@@ -443,7 +330,6 @@ function withinCentre_(x,y,width, height, mySnake){
 
     return x <= xmax && x >= xmin && y <= ymax && y >= ymin;
 }
-
 
 function getSafeTail_(mySnake, grid, tail) {
 
@@ -490,13 +376,16 @@ function checkForEmptyCorners(grid, mySnake){
     cornerEmptyNess.push([ "bottomRight",  mySnake.bottomRightQuadrantFilled, [grid.width-1, grid.height-1]]);
 
     cornerEmptyNess.sort((a,b) => {
-        return a[1] < b[1]; 
+        return (a[1] < b[1]); 
     });
 
-    for(var i = 0; i < cornerEmptyNess.length; i++){
+    for(var i = cornerEmptyNess.length - 1; i >= 0; i--){
         var corner = cornerEmptyNess[i];
         var x = corner[2][0];
         var y = corner[2][1];
+
+        console.log("Sorted corners:");
+        console.log(cornerEmptyNess);
 
         if(grid.isWalkableAt(x,y)){
             var toCorner = shortestPath_(mySnake, [x, y], grid.clone());
@@ -631,8 +520,6 @@ var api = {
 	findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
 	findBestFoodPathPos: findBestFoodPathPos_,
 	findDirection: findDirection_,
-  findSafeZones: findSafeZones_,
-  findBestSafeZone: findBestSafeZone_,
   getSafeTail : getSafeTail_,
   withinCentre : withinCentre_,
   goToCentre : goToCentre_,
