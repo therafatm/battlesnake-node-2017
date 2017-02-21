@@ -40,7 +40,14 @@ router.post(config.routes.move, function (req, res) {
   var win = 'north';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
-  var mySnake = {coords: []};
+  var mySnake = {coords: [], 
+                 constrictedGrid: {}, 
+                topLeftQuadrantFilled: 0,
+                topRightQuadrantFilled: 0,
+                bottomLeftQuadrantFilled: 0, 
+                bottomRightQuadrantFilled: 0,
+              };
+              
   mySnake.snakeId = body.you;
   var foodArray = body.food;
   var foodPath;
@@ -52,6 +59,10 @@ router.post(config.routes.move, function (req, res) {
   // find closest food list -- args(foodArray, mySnake, gridCopy)
   console.log("My Snake");
   //console.log(mySnake);
+
+  if(ai.amIConstricted(mySnake)){
+     mySnake.constrictedGrid = ai.makeConstrictedGrid(grid.clone(), mySnake);
+  }
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length){
