@@ -24,9 +24,9 @@ var findDirection_ = function(start, dest) {
     } else if (xdif === -1) {
         return 'left';
     } else if (ydif === 1){
-        return 'up';
-    } else if (ydif === -1){
         return 'down';
+    } else if (ydif === -1){
+        return 'up';
     }
 };
 
