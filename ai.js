@@ -1,5 +1,4 @@
 var pf = require('pathfinding');
-var config  = require('./config.json');
 var bf = require('bloom-filter-js');
 var finder = new pf.AStarFinder();
 var fs = require('fs');
