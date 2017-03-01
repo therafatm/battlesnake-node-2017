@@ -1,12 +1,12 @@
 var pf = require('pathfinding');
 var config  = require('./config.json');
-let bf = require('bloom-filter-js');
+var bf = require('bloom-filter-js');
 var finder = new pf.AStarFinder();
 var fs = require('fs');
 
 console.log(bf);
 
-let currentEnemySnakes = new bf.BloomFilter();
+var currentEnemySnakes = new bf.BloomFilter();
 
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
