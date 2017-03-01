@@ -43,7 +43,14 @@ router.post(config.routes.move, function (req, res) {
   var win = 'up';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
-  var mySnake = {coords: []};
+  var mySnake = {coords: [], 
+                 constrictedGrid: {}, 
+                topLeftQuadrantFilled: 0,
+                topRightQuadrantFilled: 0,
+                bottomLeftQuadrantFilled: 0, 
+                bottomRightQuadrantFilled: 0,
+              };
+
   mySnake.snakeId = body.you;
   var foodArray = body.food;
   var foodPath;
