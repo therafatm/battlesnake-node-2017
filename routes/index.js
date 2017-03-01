@@ -37,7 +37,7 @@ router.post(config.routes.move, function (req, res) {
     depth: null,
     colors: true
   });
-  var win = 'north';
+  var win = 'up';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
   var mySnake = {coords: []};

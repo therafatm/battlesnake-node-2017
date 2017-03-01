@@ -20,13 +20,13 @@ var findDirection_ = function(start, dest) {
     console.log('ydif');
     console.log(ydif);    
     if (xdif === 1) {
-        return 'east';
+        return 'right';
     } else if (xdif === -1) {
-        return 'west';
+        return 'left';
     } else if (ydif === 1){
-        return 'north';
+        return 'up';
     } else if (ydif === -1){
-        return 'south';
+        return 'down';
     }
 };
 
