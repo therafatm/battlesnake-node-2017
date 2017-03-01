@@ -21,7 +21,10 @@ router.post(config.routes.start, function (req, res) {
   // Response data
   console.log(req.body);
   var data = {
-    taunt: config.snake.taunt.start
+    color: "#FF0000",
+    head_url: "http://placecage.com/c/100/100",
+    name: "Cage Snake",
+    taunt: "OH GOD NOT THE BEES"
   };
 
   return res.json(data);
