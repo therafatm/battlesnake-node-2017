@@ -8,7 +8,7 @@ console.log(bf);
 var currentEnemySnakes = new bf.BloomFilter();
 
 var findEmptyNeighbour_ = function(mySnake, grid){
-    var headNode = pf.Node(mySnake.head[0], mySnake.head[1], false);
+    var headNode = new pf.Node(mySnake.head[0], mySnake.head[1], false);
     var neighbours = grid.getNeighbors(headNode, 2);
     var dest = neighbours[0];
 
