@@ -21,10 +21,10 @@ router.post(config.routes.start, function (req, res) {
   // Response data
   console.log(req.body);
   var data = {
-    color: "#FF0000",
-    head_url: "http://placecage.com/c/100/100",
-    name: "Cage Snake",
-    taunt: "OH GOD NOT THE BEES"
+    color: "#0cf",
+    head_url: "http://i.imgur.com/qM6KaEy.gif",
+    name: "Rat Snake",
+    taunt: "Hisss..."
   };
 
   return res.json(data);
@@ -40,6 +40,7 @@ router.post(config.routes.move, function (req, res) {
     depth: null,
     colors: true
   });
+  console.log("TURN: " + body.turn);
   var win = 'up';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
