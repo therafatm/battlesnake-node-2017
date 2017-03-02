@@ -45,6 +45,7 @@ router.post(config.routes.move, function (req, res) {
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
   var mySnake = {coords: [], 
+		 len: 0,
                  constrictedGrid: {}, 
                 topLeftQuadrantFilled: 0,
                 topRightQuadrantFilled: 0,
@@ -59,7 +60,7 @@ router.post(config.routes.move, function (req, res) {
   var foodToGetPos = 0;
 
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
-  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
+  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes, false);
   // find closest food list -- args(foodArray, mySnake, gridCopy)
   console.log("My Snake");
   console.log(mySnake);

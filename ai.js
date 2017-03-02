@@ -133,7 +133,7 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, fails
 		}
 		else{
             enemySnakes.head.push(s.coords[0]);
-            if (!failsafe)
+            if (!failsafe && mySnake.len < 15)
                 markEnemySides_(s.coords[0],grid);
             enemySnakes.len.push(s.coords.length);
 		}
