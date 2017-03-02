@@ -9,7 +9,11 @@ var currentEnemySnakes = new bf.BloomFilter();
 
 var findEmptyNeighbour_ = function(mySnake, grid){
     var headNode = new pf.Node(mySnake.head[0], mySnake.head[1], false);
+    console.log("headNode");
+    console.log(headNode);
     var neighbours = grid.getNeighbors(headNode, pf.DiagonalMovement.Never);
+    console.log("neighbours");
+    console.log(neighbours);
     var dest = neighbours[0];
 
     return findDirection_(mySnake.head, [dest.x, dest.y]);
@@ -110,7 +114,7 @@ var countQuadrantEmptyness_ = function(i,j, grid, mySnake){
     }        
 }
 
-var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
+var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, failsafe){
 
 	snakes.forEach((s)=>{
 		if(mySnake.snakeId === s.id){
@@ -129,7 +133,8 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes){
 		}
 		else{
             enemySnakes.head.push(s.coords[0]);
-            markEnemySides_(s.coords[0],grid);
+            if (!failsafe)
+                markEnemySides_(s.coords[0],grid);
             enemySnakes.len.push(s.coords.length);
 		}
 

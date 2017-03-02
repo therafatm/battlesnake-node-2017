@@ -73,7 +73,8 @@ app.use(function (err, req, res, next) {
   var grid = new pf.Grid(body.width, body.height);
 
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
-  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
+  var failsafe = true;
+  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes, failsafe);
   var win = ai.findEmptyNeighbour(mySnake, grid);
   if(!win){
     win = "up";
