@@ -58,11 +58,17 @@ app.use(function (err, req, res, next) {
   console.log(err);
   console.log(err.stack);
 
-  // console.log("FAILED ALL MOVES. IN ERROR HANDLE.");
+  console.log("FAILED ALL MOVES. IN ERROR HANDLE.");
   var body = req.body;
-  // var enemySnakes = {head:[], len:[]};
+  var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
-  var mySnake = {coords: []};
+  var mySnake = {coords: [],
+                     constrictedGrid: {},
+                    topLeftQuadrantFilled: 0,
+                    topRightQuadrantFilled: 0,
+                    bottomLeftQuadrantFilled: 0,
+                    bottomRightQuadrantFilled: 0,
+              };
   mySnake.snakeId = body.you;
   var grid = new pf.Grid(body.width, body.height);
 
@@ -73,10 +79,6 @@ app.use(function (err, req, res, next) {
     win = "up";
     console.log("No empty neighbours");
   }
-  // var first = ai.getSafeTail(mySnake, grid, mySnake.tail);
-  // var win = ai.findDirection(mySnake.head, first);
-  // var win = "north";
-
 
   var data = {
     move: win, // one of: ["north", "east", "south", "west"]
