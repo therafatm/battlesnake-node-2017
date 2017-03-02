@@ -531,7 +531,8 @@ var api = {
   goToCentre : goToCentre_,
   goToTail : goToTail_,
   nextStepTail : nextStepTail_,
-  canReturnFromPoint : canReturnFromPoint_
+  canReturnFromPoint : canReturnFromPoint_,
+  findEmptyNeighbour : findEmptyNeighbour_
 };
 
 module.exports = api;

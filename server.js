@@ -74,7 +74,7 @@ app.use(function (err, req, res, next) {
 
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
-  var win = ai.findEmptyNeighbour_(mySnake, grid);
+  var win = ai.findEmptyNeighbour(mySnake, grid);
   if(!win){
     win = "up";
     console.log("No empty neighbours");
