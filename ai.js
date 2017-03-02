@@ -10,7 +10,9 @@ var currentEnemySnakes = new bf.BloomFilter();
 var findEmptyNeighbour_ = function(mySnake, grid){
     var headNode = pf.Node(mySnake.head[0], mySnake.head[1], false);
     var neighbours = grid.getNeighbors(headNode, 2);
-    return findDirection_(mySnake.head, neighbours[0]);
+    var dest = neighbours[0];
+
+    return findDirection_(mySnake.head, [dest.x, dest.y]);
 }
 
 var setSnakeBounds = function(mySnake, coords){
