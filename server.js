@@ -70,7 +70,7 @@ app.use(function (err, req, res, next) {
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
   var win = ai.findEmptyNeighbour_(mySnake, grid);
   if(!win){
-    win = "north";
+    win = "up";
     console.log("No empty neighbours");
   }
   // var first = ai.getSafeTail(mySnake, grid, mySnake.tail);
