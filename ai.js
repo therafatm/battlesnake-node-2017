@@ -56,16 +56,16 @@ var amIConstricted_ = function(mySnake){
 
 //finds direction to go from head to destination
 var findDirection_ = function(start, dest) {
-    console.info("start:");
-    console.info(start);
-    console.info("end:");
-    console.info(dest);
+    console.log("start:");
+    console.log(start);
+    console.log("end:");
+    console.log(dest);
     var xdif = dest[0] - start[0];
     var ydif = dest[1] - start[1];
-    console.info('xdif');
-    console.info(xdif);
-    console.info('ydif');
-    console.info(ydif);    
+    console.log('xdif');
+    console.log(xdif);
+    console.log('ydif');
+    console.log(ydif);    
     if (xdif === 1) {
         return 'right';
     } else if (xdif === -1) {
@@ -167,7 +167,7 @@ var findSafeInConstrictedGrid_ = function(mySnake) {
     var gridCopy = mySnake.constrictedGrid.clone();
 
     var findCorner = findFarthestCorner(mySnake);
-    console.info("Corner: " + findCorner);
+    console.log("Corner: " + findCorner);
 
     var cornerMap = { "topRight" : [gridCopy.width-1, 0], 
                       "topLeft" : [0, 0],
@@ -186,7 +186,7 @@ var findSafeInConstrictedGrid_ = function(mySnake) {
         }
     }
 
-    console.warn("No reachable empty corners");
+    console.log("No reachable empty corners");
 };
 
 function findFarthestCorner(mySnake){
@@ -237,10 +237,10 @@ function BFSMarking(grid, i, j) {
 //finds shortest path from head to target
 var shortestPath_ = function(mySnake, target, grid){
     // use A* to find the shortest path to target item
-    console.info("my head:");
-    console.info(mySnake.head);
-    console.info("target:");
-    console.info(target);
+    console.log("my head:");
+    console.log(mySnake.head);
+    console.log("target:");
+    console.log(target);
     var path = finder.findPath(mySnake.head[0], mySnake.head[1], target[0], target[1], grid);
 	return path;
 };
@@ -320,7 +320,7 @@ var goToCentre_ = function(mySnake, gridCopy){
         } 
     }
 
-    console.warn("No space in centre found.");
+    console.log("No space in centre found.");
     var cornerPath = checkForEmptyCorners(gridCopy, mySnakeCopy);
     return cornerPath;
     //if no corner path, idk what to do
@@ -367,7 +367,7 @@ function getSafeTail_(mySnake, grid, tail) {
     }
 
     //Edge case??
-    console.warn("No safe path to tail found.");
+    console.log("No safe path to tail found.");
     return [];
 }
 
@@ -390,20 +390,20 @@ function checkForEmptyCorners(grid, mySnake){
         var x = corner[2][0];
         var y = corner[2][1];
 
-        console.info("Sorted corners:");
-        console.info(cornerEmptyNess);
+        console.log("Sorted corners:");
+        console.log(cornerEmptyNess);
 
         if(grid.isWalkableAt(x,y)){
             var toCorner = shortestPath_(mySnake, [x, y], grid.clone());
             if(toCorner.length>1) {
-                console.info("Sending path to corner " + corner[0]);
-                console.info(toCorner);
+                console.log("Sending path to corner " + corner[0]);
+                console.log(toCorner);
                 return toCorner;
             }
         }
     }
 
-    console.warn("No empty corners found. No path to tail found.");
+    console.log("No empty corners found. No path to tail found.");
     return [[]]
 }
 
@@ -432,8 +432,8 @@ function nextStepTail_(mySnake, grid){
 
     var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
 
-    console.info("TAILPATH IN nextStepTail_:");
-    console.info(tailPath);
+    console.log("TAILPATH IN nextStepTail_:");
+    console.log(tailPath);
     if( tailPath.length > 2 && canReturnFromPoint_(mySnake, gridCopy, tailPath)){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
@@ -459,11 +459,11 @@ function nextStepTail_(mySnake, grid){
 
 var makeConstrictedGrid_ = function(grid, mySnake) {
 
-    console.info("Here");
+    console.log("Here");
     var width = mySnake.rightBound - mySnake.leftBound + 1;
     var height =  mySnake.bottomBound - mySnake.topBound + 1;
-    console.info(width);
-    console.info(height);
+    console.log(width);
+    console.log(height);
 
     var newGrid = new pf.Grid(width, height);
     var newNodes = new Array(height);
@@ -480,7 +480,7 @@ var makeConstrictedGrid_ = function(grid, mySnake) {
 };
 
 function canReturnFromPoint_(mySnake, grid, foodPath) {
-    console.warn("CAN RETURN FROM POINT");
+    console.log("CAN RETURN FROM POINT");
     var gridCopy = grid.clone();
     var foodPathCopy = JSON.parse(JSON.stringify(foodPath));
     var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
@@ -497,10 +497,10 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     console.log(pathToTail);
     var pathToCorner = checkForEmptyCorners(gridCopy, mySnake);
     if (pathToTail && pathToTail.length > 3 && pathToCorner && pathToCorner.length > 1) {
-        console.warn("YES, I CAN")
+        console.log("YES, I CAN")
         return true;
     } else {
-        console.warn("NO, I CANNOT")
+        console.log("NO, I CANNOT")
         return false;
     }
 }
@@ -509,14 +509,14 @@ function goToTail_(mySnake, grid) {
     var safeToTailPath = getSafeTail_(mySnake, grid.clone(), mySnake.tail);
     if(safeToTailPath.length <= 2){
         safeToTailPath = checkForEmptyCorners(grid, mySnake);
-        console.warn("Corner Path found:");
+        console.log("Corner Path found:");
     }
 
     else{
-        console.warn("Safe to tail path found:");
+        console.log("Safe to tail path found:");
     }
 
-    console.info(safeToTailPath);
+    console.log(safeToTailPath);
     return safeToTailPath;
 }
 
@@ -531,8 +531,7 @@ var api = {
   goToCentre : goToCentre_,
   goToTail : goToTail_,
   nextStepTail : nextStepTail_,
-  canReturnFromPoint : canReturnFromPoint_,
-  findEmptyNeighbour : findEmptyNeighbour_,
+  canReturnFromPoint : canReturnFromPoint_
 };
 
 module.exports = api;
