@@ -21,7 +21,10 @@ router.post(config.routes.start, function (req, res) {
   // Response data
   console.log(req.body);
   var data = {
-    taunt: config.snake.taunt.start
+    color: "#FF0000",
+    head_url: "http://placecage.com/c/100/100",
+    name: "Cage Snake",
+    taunt: "OH GOD NOT THE BEES"
   };
 
   return res.json(data);
@@ -37,7 +40,7 @@ router.post(config.routes.move, function (req, res) {
     depth: null,
     colors: true
   });
-  var win = 'north';
+  var win = 'up';
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
   var mySnake = {coords: [], 
@@ -58,7 +61,7 @@ router.post(config.routes.move, function (req, res) {
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
   // find closest food list -- args(foodArray, mySnake, gridCopy)
   console.log("My Snake");
-  //console.log(mySnake);
+  console.log(mySnake);
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length){
@@ -119,8 +122,8 @@ router.post(config.routes.move, function (req, res) {
   else{
     //TODO: GO TOWARDS FOOD
     var foodToGet = closestFoodPaths[foodToGetPos];
-    console.log("Food to get:")
-    //console.log(foodToGet);
+    console.log("Food to get:");
+    console.log(foodToGet);
     win = ai.findDirection(mySnake.head, foodToGet[1]);
   }
 
@@ -130,6 +133,7 @@ router.post(config.routes.move, function (req, res) {
     taunt: config.snake.taunt.move
   };
 
+  console.log(win);
   console.timeEnd("Move");
   return res.json(data);
 });

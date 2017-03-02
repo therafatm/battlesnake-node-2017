@@ -1,11 +1,11 @@
 var pf = require('pathfinding');
-var config  = require('./config.json');
-let bf = require('bloom-filter-js');
+var bf = require('bloom-filter-js');
+var fs = require('fs');
 var finder = new pf.JumpPointFinder({diagonalMovement: pf.DiagonalMovement.Never});
 
 console.log(bf);
 
-let currentEnemySnakes = new bf.BloomFilter();
+var currentEnemySnakes = new bf.BloomFilter();
 
 var findEmptyNeighbour_ = function(mySnake, grid){
     var headNode = pf.Node(mySnake.head[0], mySnake.head[1], false);
@@ -67,13 +67,13 @@ var findDirection_ = function(start, dest) {
     console.log('ydif');
     console.log(ydif);    
     if (xdif === 1) {
-        return 'east';
+        return 'right';
     } else if (xdif === -1) {
-        return 'west';
+        return 'left';
     } else if (ydif === 1){
-        return 'north';
+        return 'down';
     } else if (ydif === -1){
-        return 'south';
+        return 'up';
     }
 };
 
