@@ -59,20 +59,20 @@ app.use(function (err, req, res, next) {
   console.log(err.stack);
 
   // console.log("FAILED ALL MOVES. IN ERROR HANDLE.");
-  var body = req.body;
-  // var enemySnakes = {head:[], len:[]};
-  var snakes = body.snakes;
-  var mySnake = {coords: []};
-  mySnake.snakeId = body.you;
-  var grid = new pf.Grid(body.width, body.height);
+  // var body = req.body;
+  // // var enemySnakes = {head:[], len:[]};
+  // var snakes = body.snakes;
+  // var mySnake = {coords: []};
+  // mySnake.snakeId = body.you;
+  // var grid = new pf.Grid(body.width, body.height);
 
-  // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
-  ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
-  var win = ai.findEmptyNeighbour_(mySnake, grid);
-  if(!win){
-    win = "up";
-    console.log("No empty neighbours");
-  }
+  // // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
+  // ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes);
+  // var win = ai.findEmptyNeighbour_(mySnake, grid);
+  // if(!win){
+  //   win = "up";
+    console.info("No empty neighbours");
+  // }
   // var first = ai.getSafeTail(mySnake, grid, mySnake.tail);
   // var win = ai.findDirection(mySnake.head, first);
   // var win = "north";
