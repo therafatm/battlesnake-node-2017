@@ -362,7 +362,7 @@ function nextStepTail_(mySnake, grid){
 }
 
 function canReturnFromPoint_(mySnake, grid, foodPath) {
-    console.log("CAN RETURN FROM POINT");
+    console.log("CAN RETURN FROM POINT?");
     var gridCopy = grid.clone();
     var foodPathCopy = JSON.parse(JSON.stringify(foodPath));
     var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
@@ -370,7 +370,7 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
         var tail = mySnakeCopy.coords.pop();
         gridCopy.setWalkableAt(tail[0], tail[1], true);
         mySnakeCopy.coords.unshift(foodPathCopy[i]);
-        gridCopy.setWalkableAt(foodPathCopy[i][0], foodPathCopy[i][1], true);
+        gridCopy.setWalkableAt(foodPathCopy[i][0], foodPathCopy[i][1], false);
     }
 
     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
