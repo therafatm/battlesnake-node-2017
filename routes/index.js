@@ -64,8 +64,13 @@ router.post(config.routes.move, function (req, res) {
   console.log("My Snake");
   console.log(mySnake);
 
+  var healthOffset = 85;
+  if(mySnake.len > 45){
+    healthOffset = 70;
+  }
+  
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
-  if(closestFoodPaths.length && enemySnakes.head.length && mySnake.health <= 85){
+  if(closestFoodPaths.length && enemySnakes.head.length && mySnake.health <= healthOffset){
     console.log("Prioritizing Food.");
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake, grid, foodArray);
   }
