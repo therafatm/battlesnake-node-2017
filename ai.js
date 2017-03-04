@@ -232,9 +232,13 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake, gr
                     var topFoodPath = snakesClosestFoods[0];
                     var topFoodPathPos = topFoodPath[topFoodPath.length - 1];
                     if((topFoodPathPos[0] === closestFoodInOrder[i][0]) && (topFoodPathPos[1] === closestFoodInOrder[i][1])){
-                        if(!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodInOrder[j])){
-                            posChanged = true;
-                            break;
+                        if(!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodInOrder[i])){
+                            if((findDistance(closestFoodInOrder[i],mySnake.coords[mySnake.len-1]) === 1) 
+                                && (findDistance(closestFoodInOrder[i],mySnake.coords[0]) === 1)
+                                ){
+                                posChanged = true;
+                                break;                                
+                            }
                         }
                     }
                 }
