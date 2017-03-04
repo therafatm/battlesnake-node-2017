@@ -123,7 +123,7 @@ var markEnemySides_ = function(head, grid) {
 function buildDistanceGrid (grid){
     var distanceGrid = new Array(grid.height);
     for (var i = 0; i < distanceGrid.length; i++) {
-      distance[i] = new Array(grid.width);
+      distanceGrid[i] = new Array(grid.width);
     }
     return distanceGrid;
 }
