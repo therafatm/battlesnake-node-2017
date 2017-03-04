@@ -72,7 +72,7 @@ router.post(config.routes.move, function (req, res) {
     console.log(foodToGetPos);
 
     if (foodToGetPos !== -1) {
-      if (!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodPaths[foodToGetPos])) {
+      if () {
         foodToGetPos = -1;
       }
     }
