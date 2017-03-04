@@ -56,7 +56,7 @@ router.post(config.routes.move, function (req, res) {
   var foodArray = body.food;
   var foodPath;
   var grid = new pf.Grid(body.width, body.height);
-  var foodToGetPos = 0;
+  var foodToGetPos = -1;
 
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes, false);
