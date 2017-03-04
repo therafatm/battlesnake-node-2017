@@ -161,6 +161,8 @@ function findFarthestPointPath(mySnake, grid) {
     }
 
     var path = shortestPath_(mySnake, [farthest.node.x, farthest.node.y], gridCopy);
+    console.log("Path to farthest point:");
+    console.log(path[0],path[1]);
     console.log("I worked.");
     return path;
 }
@@ -349,6 +351,7 @@ function nextStepTail_(mySnake, grid){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
         //no path to tail
+        console.log("no path to tail");
         var farthestPointPath = findFarthestPointPath(mySnake, gridCopy.clone()); 
         if(farthestPointPath && farthestPointPath.length > 1){
             return findDirection_(mySnake.head, farthestPointPath[1]); 
