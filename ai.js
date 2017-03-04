@@ -329,8 +329,8 @@ function checkForEmptyCorners(grid, mySnake){
 
     for(var i = cornerEmptyNess.length - 1; i >= 0; i--){
         var corner = cornerEmptyNess[i];
-        var x = corner[2][0];
-        var y = corner[2][1];
+        var x = corner[0][0];
+        var y = corner[0][1];
 
         console.log("Sorted corners:");
         console.log(cornerEmptyNess);
@@ -391,7 +391,7 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     mySnakeCopy.head = mySnakeCopy.coords[0];
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
     //check next condition
-    var pathToCorner= checkForEmptyCorners(grid.clone(), mySnake);
+    var pathToCorner= checkForEmptyCorners(grid.clone(), mySnakeCopy);
     if((pathToTail && pathToTail.length > 2) && (pathToCorner && pathToCorner.length > 2) ) {
         console.log("YES, I CAN")
         return true;

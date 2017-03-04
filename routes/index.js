@@ -88,11 +88,9 @@ router.post(config.routes.move, function (req, res) {
 
     //if not at centre, go to centre
     if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake)){
-      console.log("im within centre");
+      console.log("im not within centre");
       var shortestPathToCentre = ai.goToCentre(mySnake, grid);
-
       if (shortestPathToCentre.length > 1) {
-
         // can Return from centre
         if (ai.canReturnFromPoint(mySnake, grid.clone(), shortestPathToCentre)) {      
           win = ai.findDirection(mySnake.head, shortestPathToCentre[1]);
