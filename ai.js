@@ -275,24 +275,28 @@ function getSafeTail_(mySnake, grid, tail) {
     
     var x = tail[0];
     var y = tail[1];
+    var offsetFromTail = 2;
+    if(mySnake.len >= 15){
+        offsetFromTail = 1;
+    }
 
-    if (grid.isInside(x,y+2) && grid.isWalkableAt(x,y+2)) {
-        var toTail = shortestPath_(mySnake, [x,y+2], grid.clone());
+    if (grid.isInside(x,y+offsetFromTail) && grid.isWalkableAt(x,y+offsetFromTail)) {
+        var toTail = shortestPath_(mySnake, [x,y+offsetFromTail], grid.clone());
         if(toTail.length>1) return toTail;
     }
 
-    if (grid.isInside(x,y-2) && grid.isWalkableAt(x,y-2)) {
-        var toTail = shortestPath_(mySnake, [x,y-2], grid.clone());
+    if (grid.isInside(x,y-offsetFromTail) && grid.isWalkableAt(x,y-offsetFromTail)) {
+        var toTail = shortestPath_(mySnake, [x,y-offsetFromTail], grid.clone());
         if(toTail.length>1) return toTail;
     }
 
-    if (grid.isInside(x+2,y) && grid.isWalkableAt(x+2,y))  {
-        var toTail = shortestPath_(mySnake, [x+2,y], grid.clone());
+    if (grid.isInside(x+offsetFromTail,y) && grid.isWalkableAt(x+offsetFromTail,y))  {
+        var toTail = shortestPath_(mySnake, [x+offsetFromTail,y], grid.clone());
         if(toTail.length>1) return toTail;
     }
 
-    if (grid.isInside(x-2,y) && grid.isWalkableAt(x-2,y)) {
-        var toTail = shortestPath_(mySnake, [x-2,y], grid.clone());
+    if (grid.isInside(x-offsetFromTail,y) && grid.isWalkableAt(x-offsetFromTail,y)) {
+        var toTail = shortestPath_(mySnake, [x-offsetFromTail,y], grid.clone());
         if(toTail.length>1) return toTail;
     }
 
