@@ -65,6 +65,9 @@ router.post(config.routes.move, function (req, res) {
   console.log(mySnake);
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
+    console.log("closestFoodPaths");
+    console.log(closestFoodPaths);
+
   if(closestFoodPaths.length && enemySnakes.head.length){
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
 
@@ -77,6 +80,11 @@ router.post(config.routes.move, function (req, res) {
       }
     }
     
+      if((foodToGetPos !== -1) && 
+          (closestFoodPaths[foodToGetPos].length === 2) && (ai.findDistance(closestFoodPaths[foodToGetPos][1], mySnake.coords[mySnake.len-1]) === 2)) {
+        foodToGetPos = -1;
+    }
+
     console.log("Food to get pos after:");
 
   }

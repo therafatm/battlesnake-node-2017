@@ -147,6 +147,7 @@ function buildDistanceGrid (grid){
 function findFarthestPointPath(mySnake, grid) {
     var gridCopy = grid.clone();
     var start = [mySnake.head[0], mySnake.head[1]];
+    console.log(start); 
     var queue = [];
     grid.setWalkableAt(start[0],start[1], true);
     var currentNode = grid.getNodeAt(start[0],start[1]);
@@ -174,6 +175,7 @@ function findFarthestPointPath(mySnake, grid) {
         }
 
     }
+    console.log(farthest);
 
     var path = shortestPath_(mySnake, [farthest.node.x, farthest.node.y], gridCopy);
     console.log(path);
@@ -245,8 +247,8 @@ function findDistance(start, destination){
 function makeCenterDistanceStack(startx, starty, width, height, enemySnakes){
 
     var distanceStack = [];
-    for(var i = starty; i < height; i++){
-        for(var j = startx; j < width; j++){
+    for(var i = startx; i < width; i++){
+        for(var j = starty; j < height; j++){
             var distanceToSnake = 0;
             for(var k = 0; k < enemySnakes.withinCentre.length; k++){
                 distanceToSnake += findDistance([i, j], enemySnakes.withinCentre[k]);
@@ -277,7 +279,9 @@ var goToCentre_ = function(mySnake, gridCopy, enemySnakes){
     var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
 
     //find safe spot in centre
-    var distanceStack = makeCenterDistanceStack(xmin, ymin, width, height, enemySnakes);
+    var distanceStack = makeCenterDistanceStack(xmin, ymin, centre[0], centre[1], enemySnakes);
+    console.log("distanceStack");
+    console.log(distanceStack);
 
     //find best pos in centre
     for(var i = 0; i < distanceStack.length; i++){
@@ -465,7 +469,8 @@ var api = {
     goToTail : goToTail_,
     nextStepTail : nextStepTail_,
     canReturnFromPoint : canReturnFromPoint_,
-    findEmptyNeighbour : findEmptyNeighbour_
+    findEmptyNeighbour : findEmptyNeighbour_,
+    findDistance : findDistance
 };
 
 module.exports = api;
