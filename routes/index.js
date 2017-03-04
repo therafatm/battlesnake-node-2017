@@ -21,7 +21,7 @@ router.post(config.routes.start, function (req, res) {
   // Response data
   console.log(req.body);
   var data = {
-    color: "#0cf",
+    color: "red",
     head_url: "http://i.imgur.com/qM6KaEy.gif",
     name: "Rat Snake",
     taunt: "Hisss..."
@@ -45,8 +45,7 @@ router.post(config.routes.move, function (req, res) {
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
   var mySnake = {coords: [], 
-		 len: 0,
-                 constrictedGrid: {}, 
+		            len: 0,
                 topLeftQuadrantFilled: 0,
                 topRightQuadrantFilled: 0,
                 bottomLeftQuadrantFilled: 0, 

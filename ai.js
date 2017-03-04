@@ -1,11 +1,5 @@
 var pf = require('pathfinding');
-var bf = require('bloom-filter-js');
-var fs = require('fs');
 var finder = new pf.JumpPointFinder({diagonalMovement: pf.DiagonalMovement.Never});
-
-console.log(bf);
-
-var currentEnemySnakes = new bf.BloomFilter();
 
 var findEmptyNeighbour_ = function(mySnake, grid){
     var headNode = new pf.Node(mySnake.head[0], mySnake.head[1], false);
@@ -17,47 +11,6 @@ var findEmptyNeighbour_ = function(mySnake, grid){
     var dest = neighbours[0];
 
     return findDirection_(mySnake.head, [dest.x, dest.y]);
-}
-
-var setSnakeBounds = function(mySnake, coords){
-
-    if(mySnake.leftBound){
-        mySnake.leftBound = mySnake.leftBound < coords[0] ? mySnake.leftBound : coords[0];
-    }
-
-    else{
-        mySnake.leftBound = coords[0];
-    }
-
-    if(mySnake.rightBound){
-        mySnake.rightBound = mySnake.rightBound > coords[0] ? mySnake.rightBound : coords[0];
-    }
-
-    else{
-        mySnake.rightBound = coords[0];
-    }
-
-    if(mySnake.topBound){
-        mySnake.topBound = mySnake.topBound < coords[1] ? mySnake.topBound : coords[1];
-    }
-
-    else{
-        mySnake.topBound = coords[1];
-    }
-
-    if(mySnake.bottomBound){
-        mySnake.bottomBound = mySnake.bottomBound > coords[1] ? mySnake.bottomBound : coords[1];
-    }
-
-    else{
-        mySnake.bottomBound = coords[1];
-    }
-
-}
-
-var amIConstricted_ = function(mySnake){
-
-    return ( (mySnake.rightBound - mySnake.leftBound > 2) && (mySnake.bottomBound - mySnake.topBound > 2) );
 }
 
 //finds direction to go from head to destination
@@ -124,7 +77,6 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, fails
                 mySnake.tail = s.coords[s.coords.length - 1];
                 s.coords.forEach( (c) => {
                     mySnake.coords.push(c);
-                    setSnakeBounds(mySnake, c);
                 });
             }
             mySnake.health = s.health_points;
@@ -168,77 +120,48 @@ var markEnemySides_ = function(head, grid) {
 
 }
 
-var findSafeInConstrictedGrid_ = function(mySnake) {
-
-    var safeZones = [];
-    var gridCopy = mySnake.constrictedGrid.clone();
-
-    var findCorner = findFarthestCorner(mySnake);
-    console.log("Corner: " + findCorner);
-
-    var cornerMap = { "topRight" : [gridCopy.width-1, 0], 
-                      "topLeft" : [0, 0],
-                      "bottomLeft" : [0, gridCopy.height-1],
-                      "bottomRight" : [gridCopy.width-1, gridCopy.height-1]
-                    }
-
-    //do bfs until path to spot is found
-    var cornerToGo = cornerMap[findCorner];
-    var emptyCorners = BFSMarking(gridCopy.clone(), cornerToGo[0], cornerToGo[1]);
-
-    for(var i = 0; i < emptyCorners.length ; i++){
-        var path = shortestPath_(mySnake, emptyCorners[i], gridCopy.clone());
-        if(path.length >= 1 && canReturnFromPoint_(mySnake, gridCopy.clone(), path)){
-            return path;
-        }
+function buildDistanceGrid (grid){
+    var distanceGrid = new Array(grid.height);
+    for (var i = 0; i < distanceGrid.length; i++) {
+      distance[i] = new Array(grid.width);
     }
-
-    console.log("No reachable empty corners");
-};
-
-function findFarthestCorner(mySnake){
-
-    var topLeft = findDistance(mySnake.head, [mySnake.leftBound, mySnake.topBound]);
-    var topRight = findDistance(mySnake.head, [mySnake.rightBound, mySnake.topBound]);
-    var bottomLeft = findDistance(mySnake.head, [mySnake.leftBound, mySnake.bottomBound]);
-    var bottomRight = findDistance(mySnake.head, [mySnake.rightBound, mySnake.bottomBound]);
-
-    var map = { "topLeft" : topLeft,
-                "topRight" : topRight,
-                "bottomLeft" : bottomLeft,
-                "bottomRight" : bottomRight};
-
-    var farthest = Math.max(topLeft, topRight, bottomRight, bottomLeft);    
-    var key = Object.keys(map).filter((x)=>{return map[x] === farthest})[0];
-
-    return key; 
+    return distanceGrid;
 }
 
-function BFSMarking(grid, i, j) {
+//need to pass in grid copy
+//returns path from farthest point
+function findFarthestPointPath(mySnake, grid) {
+    var gridCopy = grid.clone();
+    var start = [mySnake.head[0], mySnake.head[1]];
     var queue = [];
-    var emptySpaces = []
     var currentNode = grid.getNodeAt(i,j);
+    currentNode.setWalkableAt(i,j, true);
+    var distanceGrid = buildDistanceGrid(grid);
+    var farthest = {node: currentNode, distance: 0};
 
     queue.push(currentNode);
-    while(queue.length && emptySpaces.length <= 4){
-        var currentNode = queue.shift();
+    while(queue.length){
+        //visit node at front of queue
+        currentNode = queue.shift();
         if(grid.isWalkableAt(currentNode.x, currentNode.y)){
-            emptySpaces.push([currentNode.x, currentNode.y]);
             grid.setWalkableAt(currentNode.x, currentNode.y, false);
-        }
-
-        var neighbours = grid.getNeighbors(currentNode, 2); // 2 because we dont want diagonal movement. check DiagonalMovement.js in pathfinding.js module
-        for(var k = 0; k < neighbours.length; k++){
-            var neighbour = neighbours[k];
-            //assuming no one else is stuck inside me
-            if(grid.isWalkableAt(neighbour.x, neighbour.y)){
-                emptySpaces.push([neighbour.x, neighbour.y]);
-                grid.setWalkableAt(neighbour.x, neighbour.y, false);
-                queue.push(neighbour);
+            distanceGrid[currentNode.x, currentNode.y] = findDistance([currentNode.x, currentNode.y], start);
+            //set farthest node
+            var farthestDistance = Math.max(farthest.distance, distanceGrid[currentNode.x, currentNode.y]);
+            if(farthestDistance != farthest.distance){
+                farthest = {node: currentNode, distance: farthestDistance};
             }
         }
+
+        var neighbours = grid.getNeighbors(currentNode, pf.DiagonalMovement.Never); // gives me nodes
+        for(var k = 0; k < neighbours.length; k++){
+            var neighbour = neighbours[k];
+            queue.push(neighbour);
+        }
     }
-    return emptySpaces;   
+
+    var path = shortestPath_(mySnake, [farthest.node.x, farthest.node.y], gridCopy);
+    return path;
 }
 
 //finds shortest path from head to target
@@ -270,7 +193,6 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 
 	return foodPaths;
 };
-
 
 // returns -1 if no best path exists
 var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
@@ -328,7 +250,7 @@ var goToCentre_ = function(mySnake, gridCopy){
     }
 
     console.log("No space in centre found.");
-    var cornerPath = checkForEmptyCorners(gridCopy, mySnakeCopy);
+    var cornerPath = findFarthestPointPath(gridCopy, mySnakeCopy);
     return cornerPath;
     //if no corner path, idk what to do
 }
@@ -347,7 +269,7 @@ function withinCentre_(x,y,width, height, mySnake){
 function getSafeTail_(mySnake, grid, tail) {
 
     if(!tail){
-        checkForEmptyCorners(grid, mySnake);
+        return findFarthestPointPath(mySnake, grid.clone());
     }
 
     var x = tail[0];
@@ -378,6 +300,7 @@ function getSafeTail_(mySnake, grid, tail) {
     return [];
 }
 
+//returns path to empty corner
 function checkForEmptyCorners(grid, mySnake){
 
     if(!grid){console.log("grid is not valid.")} 
@@ -416,75 +339,26 @@ function checkForEmptyCorners(grid, mySnake){
 
 function nextStepTail_(mySnake, grid){
     var gridCopy = grid.clone();
-    // var mySnakeCopy = JSON.parse(JSON.stringify(mySnake));
-    // var first;
-    // for (var i = 0; i<5; i++){
-    //     var t = mySnakeCopy.coords.pop();
-    //     gridCopy.setWalkableAt(t[0], t[1], true);
-    //     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
-
-    //     var path = goToTail_(mySnakeCopy, gridCopy);
-    //     if (first === undefined) {
-    //         first = path;
-    //     }
-    //     if (path.length > 1) {
-    //         mySnakeCopy.coords.unshift(path[1]);
-    //         mySnakeCopy.head = path[1];
-    //         gridCopy.setWalkableAt(path[1][0], path[1][1], false);
-    //     } else {
-    //         var first = checkForEmptyCorners(grid, mySnake);
-    //         return findDirection_(mySnake.head, first[1]);
-    //     }
-    // }
-
     var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
 
     console.log("TAILPATH IN nextStepTail_:");
     console.log(tailPath);
+
     if( tailPath.length > 2 && canReturnFromPoint_(mySnake, gridCopy, tailPath)){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
-        var cornerPath = checkForEmptyCorners(gridCopy, mySnake);
-        if(cornerPath && cornerPath.length > 1){
-            return findDirection_(mySnake.head, cornerPath[1]); 
+        //no path to tail
+        var farthestPointPath = findFarthestPointPath(gridCopy.clone(), mySnake); 
+        if(farthestPointPath && farthestPointPath.length > 1){
+            return findDirection_(mySnake.head, farthestPointPath[1]); 
         }
         else {
             //I'm constricted
             //find farthest corner from itself
-            mySnake.constrictedGrid = makeConstrictedGrid_(grid.clone(), mySnake);
-            var pathToGo = findSafeInConstrictedGrid_(mySnake);
-            if(pathToGo.length >= 1){
-                return findDirection_(mySnake.head, pathToGo[1]);
-            }
-            // handle constriction
-            if(tailPath && tailPath.length >= 1){
-                return findDirection_(mySnake.head, tailPath[1]);
-            }
+            console.assert(true, "Should never happen.");
         }
     }
 }
-
-var makeConstrictedGrid_ = function(grid, mySnake) {
-
-    console.log("Here");
-    var width = mySnake.rightBound - mySnake.leftBound + 1;
-    var height =  mySnake.bottomBound - mySnake.topBound + 1;
-    console.log(width);
-    console.log(height);
-
-    var newGrid = new pf.Grid(width, height);
-    var newNodes = new Array(height);
-
-    for (var i = 0; i < height; ++i) {
-        newNodes[i] = new Array(width);
-        for (var j = 0; j < width; ++j) {
-            newNodes[i][j] = new pf.Node(j, i, grid.isWalkableAt(mySnake.bottomBound + i, mySnake.topBound + j));
-        }
-    }
-
-    newGrid.nodes = newNodes;
-    return newGrid;
-};
 
 function canReturnFromPoint_(mySnake, grid, foodPath) {
     console.log("CAN RETURN FROM POINT");
@@ -502,8 +376,8 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     mySnakeCopy.head = mySnakeCopy.coords[0];
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
     console.log(pathToTail);
-    var pathToCorner = checkForEmptyCorners(gridCopy, mySnake);
-    if (pathToTail && pathToTail.length > 3 && pathToCorner && pathToCorner.length > 1) {
+    //check next condition
+    if(pathToTail && pathToTail.length > 2) {
         console.log("YES, I CAN")
         return true;
     } else {
@@ -515,7 +389,7 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
 function goToTail_(mySnake, grid) {
     var safeToTailPath = getSafeTail_(mySnake, grid.clone(), mySnake.tail);
     if(safeToTailPath.length <= 2){
-        safeToTailPath = checkForEmptyCorners(grid, mySnake);
+        safeToTailPath = findFarthestPointPath(grid.clone(), mySnake);
         console.log("Corner Path found:");
     }
 
@@ -528,18 +402,18 @@ function goToTail_(mySnake, grid) {
 }
 
 var api = {
-	initSelfGridSnakeHeads: initSelfGridSnakeHeads_,
-	shortestPath: shortestPath_,
-	findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
-	findBestFoodPathPos: findBestFoodPathPos_,
-	findDirection: findDirection_,
-  getSafeTail : getSafeTail_,
-  withinCentre : withinCentre_,
-  goToCentre : goToCentre_,
-  goToTail : goToTail_,
-  nextStepTail : nextStepTail_,
-  canReturnFromPoint : canReturnFromPoint_,
-  findEmptyNeighbour : findEmptyNeighbour_
+    initSelfGridSnakeHeads: initSelfGridSnakeHeads_,
+    shortestPath: shortestPath_,
+    findClosestFoodPathsInOrder: findClosestFoodPathsInOrder_,
+    findBestFoodPathPos: findBestFoodPathPos_,
+    findDirection: findDirection_,
+    getSafeTail : getSafeTail_,
+    withinCentre : withinCentre_,
+    goToCentre : goToCentre_,
+    goToTail : goToTail_,
+    nextStepTail : nextStepTail_,
+    canReturnFromPoint : canReturnFromPoint_,
+    findEmptyNeighbour : findEmptyNeighbour_
 };
 
 module.exports = api;

@@ -63,7 +63,7 @@ app.use(function (err, req, res, next) {
   var enemySnakes = {head:[], len:[]};
   var snakes = body.snakes;
   var mySnake = {coords: [],
-                     constrictedGrid: {},
+                    len: 0,
                     topLeftQuadrantFilled: 0,
                     topRightQuadrantFilled: 0,
                     bottomLeftQuadrantFilled: 0,
