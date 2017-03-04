@@ -44,11 +44,11 @@ router.post(config.routes.move, function (req, res) {
   var win = 'up';
   var enemySnakes = {head:[], len:[], withinCentre: []};
   var snakes = body.snakes;
-  var mySnake = {coords: [], 
+  var mySnake = {coords: [],
 		            len: 0,
                 topLeftQuadrantFilled: 0,
                 topRightQuadrantFilled: 0,
-                bottomLeftQuadrantFilled: 0, 
+                bottomLeftQuadrantFilled: 0,
                 bottomRightQuadrantFilled: 0,
               };
 
@@ -69,6 +69,7 @@ router.post(config.routes.move, function (req, res) {
     healthOffset = 70;
   }
 
+  function getMove() {
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length && mySnake.health <= healthOffset){
     console.log("Prioritizing Food.");
@@ -85,28 +86,28 @@ router.post(config.routes.move, function (req, res) {
 
     //if not at centre, go to centre
       if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake)
-          && (mySnake.len <= (body.width * 1.5)) 
+          && (mySnake.len <= (body.width * 1.5))
       ){
       console.log("im not within centre");
       var shortestPathToCentre = ai.goToCentre(mySnake, grid, enemySnakes);
       if (shortestPathToCentre.length > 1) {
         // can Return from centre
-        if (ai.canReturnFromPoint(mySnake, grid.clone(), shortestPathToCentre)) {      
+        if (ai.canReturnFromPoint(mySnake, grid.clone(), shortestPathToCentre)) {
           win = ai.findDirection(mySnake.head, shortestPathToCentre[1]);
         }
-        //no path to tail from next pos to centre 
+        //no path to tail from next pos to centre
         else {
           console.log("no path to tail from next pos to centre");
           win = ai.nextStepTail(mySnake, grid);
         }
       } else {
         // no path to centre
-        console.log("no path to centre. following tail.");        
+        console.log("no path to centre. following tail.");
         win = ai.nextStepTail(mySnake, grid);
       }
     }
     else {
-      console.log("I'm within centre. following tail");      
+      console.log("I'm within centre. following tail");
       win = ai.nextStepTail(mySnake, grid);
     }
   }
@@ -117,6 +118,38 @@ router.post(config.routes.move, function (req, res) {
     console.log("Food to get:");
     console.log(foodToGet);
     win = ai.findDirection(mySnake.head, foodToGet[1]);
+  }
+
+  }
+
+  getMove();
+  if (win === 'up') {
+      var headNode = new pf.Node(mySnake.head[0], mySnake.head[1]-1, true);
+      if (grid.getNeighbors(headNode).length < 3) {
+          grid.setWalkableAt(mySnake.head[0], mySnake.head[1]-1, false);
+          getMove();
+      }
+  }
+  if (win === 'down') {
+      var headNode = new pf.Node(mySnake.head[0], mySnake.head[1]+1, true);
+      if (grid.getNeighbors(headNode).length < 3) {
+          grid.setWalkableAt(mySnake.head[0], mySnake.head[1]+1, false);
+          getMove();
+      }
+  }
+  if (win === 'left') {
+      var headNode = new pf.Node(mySnake.head[0]-1, mySnake.head[1], true);
+      if (grid.getNeighbors(headNode).length < 3) {
+          grid.setWalkableAt(mySnake.head[0]-1, mySnake.head[1], false);
+          getMove();
+      }
+  }
+  if (win === 'right') {
+      var headNode = new pf.Node(mySnake.head[0]+1, mySnake.head[1], true);
+      if (grid.getNeighbors(headNode).length < 3) {
+          grid.setWalkableAt(mySnake.head[0]+1, mySnake.head[1], false);
+          getMove();
+      }
   }
 
   // Response data
