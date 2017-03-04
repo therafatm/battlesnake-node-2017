@@ -344,7 +344,7 @@ function nextStepTail_(mySnake, grid){
 
     console.log("TAILPATH IN nextStepTail_:");
 
-    if( tailPath.length > 2 && canReturnFromPoint_(mySnake, gridCopy, tailPath)){
+    if(tailPath.length > 2){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
         //no path to tail
