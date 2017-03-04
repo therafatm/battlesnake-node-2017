@@ -129,6 +129,9 @@ router.post(config.routes.move, function (req, res) {
   };
 
   console.log(win);
+  if(!win) {
+	throw error();
+  }
   console.timeEnd("Move");
   return res.json(data);
 });

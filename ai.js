@@ -68,6 +68,12 @@ var countQuadrantEmptyness_ = function(i,j, grid, mySnake){
 }
 
 var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, failsafe){
+	    //find my snake
+	    snakes.forEach((s)=>{
+		if (mySnake.snakeId === s.id) {
+		    mySnake.len = s.coords.length;
+		}
+	    })
 
 	snakes.forEach((s)=>{
 		if(mySnake.snakeId === s.id){
@@ -162,6 +168,7 @@ function findFarthestPointPath(mySnake, grid) {
     }
 
     var path = shortestPath_(mySnake, [farthest.node.x, farthest.node.y], gridCopy);
+    console.log(path);
     console.trace();
     console.log("Path to farthest point:");
     console.log(path[0],path[path.length - 1]);
@@ -384,7 +391,8 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     mySnakeCopy.head = mySnakeCopy.coords[0];
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
     //check next condition
-    if(pathToTail && pathToTail.length > 2) {
+    var pathToCorner= checkForEmptyCorners(grid.clone(), mySnake);
+    if((pathToTail && pathToTail.length > 2) && (pathToCorner && pathToCorner.length > 2) ) {
         console.log("YES, I CAN")
         return true;
     } else {
