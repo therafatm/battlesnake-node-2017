@@ -60,7 +60,7 @@ app.use(function (err, req, res, next) {
 
   console.log("FAILED ALL MOVES. IN ERROR HANDLE.");
   var body = req.body;
-  var enemySnakes = {head:[], len:[]};
+  var enemySnakes = {head:[], len:[], withinCentre: []};
   var snakes = body.snakes;
   var mySnake = {coords: [],
                     len: 0,
