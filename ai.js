@@ -214,8 +214,9 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 	return foodPaths;
 };
 
+
 // returns -1 if no best path exists
-var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
+var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake, grid, foodArray){
 
     var posChanged = false;
     for(var i = 0; i < closestFoodInOrder.length; i++){
@@ -226,8 +227,15 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
             if((distance < closestFoodInOrder[i].length) ||
                 (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
                 //TODO: eat snake
-                posChanged = true;
-                break;
+                var snakesClosestFoods = findClosestFoodPathsInOrder_(foodArray, enemySnakes.head[j], grid.clone());
+                if(snakesClosestFoods.length > 0){
+                    var topFoodPath = snakesClosestFoods[0];
+                    var topFoodPathPos = topFoodPath[topFoodPath.length - 1];
+                    if((topFoodPathPos[0] === closestFoodInOrder[i][0]) && (topFoodPathPos[1] === closestFoodInOrder[i][1])){
+                        posChanged = true;
+                        break;
+                    }
+                }
             }
         }
         if(!posChanged){
