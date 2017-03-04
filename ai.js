@@ -250,7 +250,7 @@ var goToCentre_ = function(mySnake, gridCopy){
     }
 
     console.log("No space in centre found.");
-    var cornerPath = findFarthestPointPath(gridCopy, mySnakeCopy);
+    var cornerPath = findFarthestPointPath(mySnakeCopy, gridCopy);
     return cornerPath;
     //if no corner path, idk what to do
 }
@@ -348,7 +348,7 @@ function nextStepTail_(mySnake, grid){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
         //no path to tail
-        var farthestPointPath = findFarthestPointPath(gridCopy.clone(), mySnake); 
+        var farthestPointPath = findFarthestPointPath(mySnake, gridCopy.clone()); 
         if(farthestPointPath && farthestPointPath.length > 1){
             return findDirection_(mySnake.head, farthestPointPath[1]); 
         }
@@ -389,7 +389,7 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
 function goToTail_(mySnake, grid) {
     var safeToTailPath = getSafeTail_(mySnake, grid.clone(), mySnake.tail);
     if(safeToTailPath.length <= 2){
-        safeToTailPath = findFarthestPointPath(grid.clone(), mySnake);
+        safeToTailPath = findFarthestPointPath(mySnake, grid.clone());
         console.log("Corner Path found:");
     }
 
