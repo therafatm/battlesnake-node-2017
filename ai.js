@@ -204,7 +204,7 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
 
     var posChanged = false;
     for(var i = 0; i < closestFoodInOrder.length; i++){
-        for(var j = 0; j < enemySnakes.head.length; j++) :{
+        for(var j = 0; j < enemySnakes.head.length; j++) {
             var snakehead = enemySnakes.head[j];
             //distance between enemy snake to current best food
             if(mySnake.health >= 20){
