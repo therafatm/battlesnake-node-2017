@@ -64,6 +64,9 @@ router.post(config.routes.move, function (req, res) {
   console.log("My Snake");
   console.log(mySnake);
 
+  function getMove() {
+  var win = 'up';
+
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
     console.log("closestFoodPaths");
     console.log(closestFoodPaths);
@@ -129,7 +132,51 @@ router.post(config.routes.move, function (req, res) {
     console.log(foodToGet);
     win = ai.findDirection(mySnake.head, foodToGet[1]);
   }
+    return win;
+ }
 
+  win = getMove();
+
+        var x = mySnake.head[0];
+        var y = mySnake.head[1];
+
+        if (win === 'up') {
+            y = y-1;
+        } else if (win === 'down') {
+            y = y+1;
+        } else if (win === 'left') {
+            x = x+1;
+        } else {
+            x = x-1;
+        }
+
+        if (grid.isInside(x,y+1) && !grid.isWalkableAt(x,y+1)) {
+            if (!(x == mySnake.head[0] && (y+1) === mySnake.head[1])) {
+                grid.setWalkableAt(x, y+1, false);
+                win = getMove();
+            }
+        }
+
+        if (grid.isInside(x,y-1) && !grid.isWalkableAt(x,y-1)) {
+            if (!(x == mySnake.head[0] && (y-1) === mySnake.head[1])) {
+                grid.setWalkableAt(x, y-1, false);
+                win = getMove();
+            }
+        }
+
+        if (grid.isInside(x+1,y) && !grid.isWalkableAt(x+1,y))  {
+            if (!((x+1) == mySnake.head[0] && (y) === mySnake.head[1])) {
+                grid.setWalkableAt(x+1, y, false);
+                win = getMove();
+            }
+        }
+
+        if (grid.isInside(x-1,y) && !grid.isWalkableAt(x-1,y)) {
+            if (!((x-1) == mySnake.head[0] && (y) === mySnake.head[1])) {
+                grid.setWalkableAt(x-1, y,false);
+                win = getMove();
+            }
+        }
   // Response data
   var data = {
     move: win, // one of: ["north", "east", "south", "west"]
@@ -143,6 +190,8 @@ router.post(config.routes.move, function (req, res) {
   console.timeEnd("Move");
   return res.json(data);
 });
+
+
 
 // Handle POST request to '/end'
 router.post(config.routes.end, function (req, res) {
