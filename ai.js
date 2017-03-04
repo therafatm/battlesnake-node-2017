@@ -376,7 +376,7 @@ function checkForEmptyCorners(grid, mySnake){
     var cornerEmptyNess = [];
     cornerEmptyNess.push(["topLeft", mySnake.topLeftQuadrantFilled, [0,0] ]);
     cornerEmptyNess.push(["topRight", mySnake.topRightQuadrantFilled, [0,grid.width-1] ]);
-    cornerEmptyNess.push([ "bottomLeft", mySnake.bottomLeftQuadrantFilled, [grid.height-1, 0]]);
+    cornerEmptyNess.push([ "bottomLeft", mySnake.bottomLeftQuadrantFilled, [0, grid.height-1]]);
     cornerEmptyNess.push([ "bottomRight",  mySnake.bottomRightQuadrantFilled, [grid.width-1, grid.height-1]]);
 
     cornerEmptyNess.sort((a,b) => {
@@ -450,10 +450,11 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     console.log("Shifted snake successfully.");
     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
     mySnakeCopy.head = mySnakeCopy.coords[0];
-    var pathToTail = goToTail_(mySnakeCopy, gridCopy);
+    var pathToTail = goToTail_(mySnakeCopy, gridCopy.clone());
     //check next condition
-    var pathToCorner= checkForEmptyCorners(gridCopy.clone(), mySnakeCopy);
-    if((pathToTail && pathToTail.length > 1) && (pathToCorner && pathToCorner.length > 2) ) {
+    //var pathToCorner= checkForEmptyCorners(gridCopy.clone(), mySnakeCopy);
+    // if((pathToTail && pathToTail.length > 1) && (pathToCorner && pathToCorner.length > 2) ) {
+    if((pathToTail && pathToTail.length > 1)) {    
         console.log("YES, I CAN")
         return true;
     } else {
