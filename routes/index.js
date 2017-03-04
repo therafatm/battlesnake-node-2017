@@ -122,7 +122,7 @@ router.post(config.routes.move, function (req, res) {
   // Response data
   var data = {
     move: win, // one of: ["north", "east", "south", "west"]
-    taunt: "Health: " + str(mySnake.health)
+    taunt: "Health: " + mySnake.health
   };
 
   console.log(win);
