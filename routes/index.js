@@ -68,7 +68,7 @@ router.post(config.routes.move, function (req, res) {
   if(mySnake.len > 45){
     healthOffset = 70;
   }
-  
+
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length && mySnake.health <= healthOffset){
     console.log("Prioritizing Food.");
@@ -122,7 +122,7 @@ router.post(config.routes.move, function (req, res) {
   // Response data
   var data = {
     move: win, // one of: ["north", "east", "south", "west"]
-    taunt: config.snake.taunt.move
+    taunt: "Health: " + str(mySnake.health)
   };
 
   console.log(win);
