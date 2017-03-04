@@ -134,8 +134,9 @@ function findFarthestPointPath(mySnake, grid) {
     var gridCopy = grid.clone();
     var start = [mySnake.head[0], mySnake.head[1]];
     var queue = [];
-    var currentNode = grid.getNodeAt(start[0],start[1]);
     grid.setWalkableAt(start[0],start[1], true);
+    var currentNode = grid.getNodeAt(start[0],start[1]);
+    console.log(currentNode); 
     var distanceGrid = buildDistanceGrid(grid);
     var farthest = {node: currentNode, distance: 0};
 
@@ -143,26 +144,29 @@ function findFarthestPointPath(mySnake, grid) {
     while(queue.length){
         //visit node at front of queue
         currentNode = queue.shift();
+	console.log(currentNode);
         if(grid.isWalkableAt(currentNode.x, currentNode.y)){
-            grid.setWalkableAt(currentNode.x, currentNode.y, false);
             distanceGrid[currentNode.x, currentNode.y] = findDistance([currentNode.x, currentNode.y], start);
             //set farthest node
             var farthestDistance = Math.max(farthest.distance, distanceGrid[currentNode.x, currentNode.y]);
             if(farthestDistance != farthest.distance){
                 farthest = {node: currentNode, distance: farthestDistance};
             }
+	    console.log("Farthest Node:");
+	    console.log(farthest);
+		var neighbours = grid.getNeighbors(currentNode, pf.DiagonalMovement.Never); // gives me nodes
+		for(var k = 0; k < neighbours.length; k++){
+		    var neighbour = neighbours[k];
+		    queue.push(neighbour);
+		}
+		    grid.setWalkableAt(currentNode.x, currentNode.y, false);
         }
 
-        var neighbours = grid.getNeighbors(currentNode, pf.DiagonalMovement.Never); // gives me nodes
-        for(var k = 0; k < neighbours.length; k++){
-            var neighbour = neighbours[k];
-            queue.push(neighbour);
-        }
     }
 
     var path = shortestPath_(mySnake, [farthest.node.x, farthest.node.y], gridCopy);
     console.log("Path to farthest point:");
-    console.log(path[0],path[1]);
+    console.log(path[0],path[path.length - 1]);
     console.log("I worked.");
     return path;
 }

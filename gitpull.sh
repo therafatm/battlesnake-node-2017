@@ -1,4 +1,3 @@
-#!bin/sh
-
+#!/bin/bash
 git pull
 npm start
