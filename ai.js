@@ -227,7 +227,7 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake, gr
             if((distance < closestFoodInOrder[i].length) ||
                 (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
                 //TODO: eat snake
-                var snakesClosestFoods = findClosestFoodPathsInOrder_(foodArray, enemySnakes.head[j], grid.clone());
+                var snakesClosestFoods = findClosestFoodPathsInOrder_(foodArray, {head: enemySnakes.head[j]}, grid.clone());
                 if(snakesClosestFoods.length > 0){
                     var topFoodPath = snakesClosestFoods[0];
                     var topFoodPathPos = topFoodPath[topFoodPath.length - 1];
