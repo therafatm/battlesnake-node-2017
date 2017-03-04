@@ -104,6 +104,9 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, fails
 		  grid.setWalkableAt(pos[0], pos[1], false);
           countQuadrantEmptyness_(pos[0], pos[1], grid, mySnake);
 		});
+        if (mySnake.snakeId === s.Id) {
+		  grid.setWalkableAt(mySnake.coords[mySnake.len-1][0], mySnake.coords[mySnake.len-1][1], true);
+        }
 	});
 };
 
@@ -361,7 +364,7 @@ function nextStepTail_(mySnake, grid){
 
     console.log("TAILPATH IN nextStepTail_:");
 
-    if(tailPath.length > 2){
+    if(tailPath.length > 1){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
         //no path to tail
@@ -398,7 +401,7 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
     //check next condition
     var pathToCorner= checkForEmptyCorners(gridCopy.clone(), mySnakeCopy);
-    if((pathToTail && pathToTail.length > 2) && (pathToCorner && pathToCorner.length > 2) ) {
+    if((pathToTail && pathToTail.length > 1) && (pathToCorner && pathToCorner.length > 2) ) {
         console.log("YES, I CAN")
         return true;
     } else {

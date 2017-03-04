@@ -1,6 +1,6 @@
 {
   "host": "localhost",
-  "port": 6000,
+  "port": 7000,
   "routes": {
     "info": "/",
     "start": "/start",

@@ -21,7 +21,7 @@ router.post(config.routes.start, function (req, res) {
   // Response data
   console.log(req.body);
   var data = {
-    color: "red",
+    color: "green",
     head_url: "http://i.imgur.com/qM6KaEy.gif",
     name: "Rat Snake",
     taunt: "Hisss..."
@@ -71,7 +71,7 @@ router.post(config.routes.move, function (req, res) {
     console.log("Food to get pos before:");
     console.log(foodToGetPos);
 
-    if (foodToGetPos !== -1 && mySnake.health >= 20) {
+    if (foodToGetPos !== -1 && mySnake.health >= 35) {
       if (!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodPaths[foodToGetPos])) {
         foodToGetPos = -1;
       }
