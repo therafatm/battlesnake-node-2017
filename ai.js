@@ -369,10 +369,13 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     for (var i = 1; i < foodPathCopy.length; i++) {
         var tail = mySnakeCopy.coords.pop();
         gridCopy.setWalkableAt(tail[0], tail[1], true);
-        mySnakeCopy.coords.unshift(foodPathCopy[i]);
-        gridCopy.setWalkableAt(foodPathCopy[i][0], foodPathCopy[i][1], false);
+        var newHead = foodPathCopy[i];
+        console.log(newHead);
+        mySnakeCopy.coords.unshift(newHead);
+        gridCopy.setWalkableAt(newHead[0], newHead[1], false);
     }
 
+    console.log("Shifted snake successfully.");
     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
     mySnakeCopy.head = mySnakeCopy.coords[0];
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
