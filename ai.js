@@ -271,10 +271,10 @@ var goToCentre_ = function(mySnake, gridCopy, enemySnakes){
     var width = gridCopy.width;
     var height = gridCopy.height;
     var centre = [ Math.round(width/2), Math.round(height/2) ];
-    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/3));
-    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(width/3));
-    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
-    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
+    var xmin = centre[0] - Math.min(Math.max(Math.round(mySnake.len/4),2), Math.round(width/4));
+    var xmax = centre[0] + Math.min(Math.max(Math.round(mySnake.len/4),2), Math.round(width/4));
+    var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/4),2), Math.round(height/4));
+    var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/4),2), Math.round(height/4));
 
     //find safe spot in centre
     var distanceStack = makeCenterDistanceStack(xmin, ymin, width, height, enemySnakes);
@@ -321,12 +321,6 @@ function getSafeTail_(mySnake, grid, tail) {
         offsetFromTail = 1;
     }
 
-    grid.setWalkableAt(x,y, true);
-
-    if (grid.isInside(x,y) && grid.isWalkableAt(x,y)) {
-        var toTail = shortestPath_(mySnake, [x,y], grid.clone());
-        if(toTail.length>1) return toTail;
-    }
 
     if (grid.isInside(x,y+offsetFromTail) && grid.isWalkableAt(x,y+offsetFromTail)) {
         var toTail = shortestPath_(mySnake, [x,y+offsetFromTail], grid.clone());
@@ -345,6 +339,13 @@ function getSafeTail_(mySnake, grid, tail) {
 
     if (grid.isInside(x-offsetFromTail,y) && grid.isWalkableAt(x-offsetFromTail,y)) {
         var toTail = shortestPath_(mySnake, [x-offsetFromTail,y], grid.clone());
+        if(toTail.length>1) return toTail;
+    }
+
+
+    grid.setWalkableAt(x,y, true);
+    if (grid.isInside(x,y) && grid.isWalkableAt(x,y)) {
+        var toTail = shortestPath_(mySnake, [x,y], grid.clone());
         if(toTail.length>1) return toTail;
     }
 
