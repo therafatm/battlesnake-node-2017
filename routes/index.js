@@ -123,30 +123,36 @@ router.post(config.routes.move, function (req, res) {
   }
 
   getMove();
+
+  var tmpGrid = grid.clone();
+  for (var i = 0; i < mySnake.coords.length; i++) {
+      tmpGrid.setWalkableAt(mySnake.coords[i][0], mySnake.coords[i][1], true);
+  }
+
   if (win === 'up') {
       var headNode = new pf.Node(mySnake.head[0], mySnake.head[1]-1, true);
-      if (grid.getNeighbors(headNode).length < 3) {
+      if (tmpGrid.getNeighbors(headNode, pf.DiagonalMovement.Never).length < 4) {
           grid.setWalkableAt(mySnake.head[0], mySnake.head[1]-1, false);
           getMove();
       }
   }
   if (win === 'down') {
       var headNode = new pf.Node(mySnake.head[0], mySnake.head[1]+1, true);
-      if (grid.getNeighbors(headNode).length < 3) {
+      if (tmpGrid.getNeighbors(headNode, pf.DiagonalMovement.Never).length < 4) {
           grid.setWalkableAt(mySnake.head[0], mySnake.head[1]+1, false);
           getMove();
       }
   }
   if (win === 'left') {
       var headNode = new pf.Node(mySnake.head[0]-1, mySnake.head[1], true);
-      if (grid.getNeighbors(headNode).length < 3) {
+      if (tmpGrid.getNeighbors(headNode, pf.DiagonalMovement.Never).length < 4) {
           grid.setWalkableAt(mySnake.head[0]-1, mySnake.head[1], false);
           getMove();
       }
   }
   if (win === 'right') {
       var headNode = new pf.Node(mySnake.head[0]+1, mySnake.head[1], true);
-      if (grid.getNeighbors(headNode).length < 3) {
+      if (tmpGrid.getNeighbors(headNode, pf.DiagonalMovement.Never).length < 4) {
           grid.setWalkableAt(mySnake.head[0]+1, mySnake.head[1], false);
           getMove();
       }
