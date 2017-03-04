@@ -42,7 +42,7 @@ router.post(config.routes.move, function (req, res) {
   // });
   console.log("TURN: " + body.turn);
   var win = 'up';
-  var enemySnakes = {head:[], len:[]};
+  var enemySnakes = {head:[], len:[], withinCentre: []};
   var snakes = body.snakes;
   var mySnake = {coords: [], 
 		            len: 0,
@@ -91,7 +91,7 @@ router.post(config.routes.move, function (req, res) {
           && (mySnake.len <= (body.width * 1.5)) 
       ){
       console.log("im not within centre");
-      var shortestPathToCentre = ai.goToCentre(mySnake, grid);
+      var shortestPathToCentre = ai.goToCentre(mySnake, grid, enemySnakes);
       if (shortestPathToCentre.length > 1) {
         // can Return from centre
         if (ai.canReturnFromPoint(mySnake, grid.clone(), shortestPathToCentre)) {      

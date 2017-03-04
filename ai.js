@@ -98,11 +98,16 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, fails
 
 		// set unwalkable squares - other snake body
 		s.coords.forEach((pos)=>{
-          if(grid === undefined){
+            if(grid === undefined){
             console.log("GRID IS UNDEFINED\n!");
-          }
-		  grid.setWalkableAt(pos[0], pos[1], false);
-          countQuadrantEmptyness_(pos[0], pos[1], grid, mySnake);
+            }
+            grid.setWalkableAt(pos[0], pos[1], false);
+            countQuadrantEmptyness_(pos[0], pos[1], grid, mySnake);
+
+            if(withinCentre_(pos[0], pos[1], grid.width, grid.height, mySnake)){
+                enemySnakes.withinCentre.push(pos);
+            }
+
 		});
         if (mySnake.snakeId === s.Id) {
 		  grid.setWalkableAt(mySnake.coords[mySnake.len-1][0], mySnake.coords[mySnake.len-1][1], true);
@@ -237,7 +242,31 @@ function findDistance(start, destination){
     return ( Math.abs(start[0] - destination[0]) + Math.abs(start[1]-destination[1]) );
 };
 
-var goToCentre_ = function(mySnake, gridCopy){
+function makeCenterDistanceStack(startx, starty, width, height, enemySnakes){
+
+    var distanceStack = [];
+    for(var i = starty; i < height; i++){
+        for(var j = startx; j < width; j++){
+            var distanceToSnake = 0;
+            for(var k = 0; k < enemySnakes.withinCentre.length; k++){
+                distanceToSnake += findDistance([i, j], enemySnakes.withinCentre[k]);
+            }
+            if(distanceStack.length === 0){
+                distanceStack.push({pos: [i,j], distance: distanceToSnake});
+            }            
+            else{
+               distanceStack.push({pos: [i,j], distance: distanceToSnake});
+            }
+        }
+    }
+
+    distanceStack.sort((a,b)=>{
+        return b.distance - a.distance;
+    });
+    return distanceStack;
+}
+
+var goToCentre_ = function(mySnake, gridCopy, enemySnakes){
 
     var width = gridCopy.width;
     var height = gridCopy.height;
@@ -247,15 +276,23 @@ var goToCentre_ = function(mySnake, gridCopy){
     var ymin = centre[1] - Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
     var ymax = centre[1] + Math.min(Math.max(Math.round(mySnake.len/3),2), Math.round(height/3));
 
-
     //find safe spot in centre
-    for(var i = xmin; i <= xmax; i++){
-        for(var j = ymin; j <= ymax; j++){
-            if(gridCopy.isWalkableAt(i,j)){
-                var toCenter = shortestPath_(mySnake, [i,j], gridCopy.clone());
-                if(toCenter.length>1) return toCenter;                
-            }
-        } 
+    var distanceStack = makeCenterDistanceStack(xmin, ymin, width, height, enemySnakes);
+
+    //find best pos in centre
+    for(var i = 0; i < distanceStack.length; i++){
+        var toCentre = shortestPath_(mySnake, distanceStack[i].pos, gridCopy.clone());
+        if(toCentre.length > 1){
+            return toCentre;
+        }
+    }
+
+    //if no body in centre
+    if(distanceStack.length === 0){
+        var toCentre = shortestPath_(mySnake, centre, gridCopy.clone());
+        if(toCentre.length > 1){
+            return toCentre;
+        }
     }
 
     console.log("No space in centre found.");
