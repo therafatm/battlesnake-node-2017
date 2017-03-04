@@ -134,8 +134,8 @@ function findFarthestPointPath(mySnake, grid) {
     var gridCopy = grid.clone();
     var start = [mySnake.head[0], mySnake.head[1]];
     var queue = [];
-    var currentNode = grid.getNodeAt(i,j);
-    currentNode.setWalkableAt(i,j, true);
+    var currentNode = grid.getNodeAt(start[0],start[1]);
+    currentNode.setWalkableAt(start[0],start[1], true);
     var distanceGrid = buildDistanceGrid(grid);
     var farthest = {node: currentNode, distance: 0};
 
