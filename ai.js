@@ -329,8 +329,8 @@ function checkForEmptyCorners(grid, mySnake){
 
     for(var i = cornerEmptyNess.length - 1; i >= 0; i--){
         var corner = cornerEmptyNess[i];
-        var x = corner[0][0];
-        var y = corner[0][1];
+        var x = corner[2][0];
+        var y = corner[2][1];
 
         console.log("Sorted corners:");
         console.log(cornerEmptyNess);
