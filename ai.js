@@ -251,7 +251,7 @@ var goToCentre_ = function(mySnake, gridCopy){
     }
 
     console.log("No space in centre found.");
-    var cornerPath = findFarthestPointPath(mySnakeCopy, gridCopy);
+    var cornerPath = findFarthestPointPath(mySnake, gridCopy);
     return cornerPath;
     //if no corner path, idk what to do
 }
