@@ -144,7 +144,6 @@ function findFarthestPointPath(mySnake, grid) {
     while(queue.length){
         //visit node at front of queue
         currentNode = queue.shift();
-	console.log(currentNode);
         if(grid.isWalkableAt(currentNode.x, currentNode.y)){
             distanceGrid[currentNode.x, currentNode.y] = findDistance([currentNode.x, currentNode.y], start);
             //set farthest node
@@ -152,8 +151,6 @@ function findFarthestPointPath(mySnake, grid) {
             if(farthestDistance != farthest.distance){
                 farthest = {node: currentNode, distance: farthestDistance};
             }
-	    console.log("Farthest Node:");
-	    console.log(farthest);
 		var neighbours = grid.getNeighbors(currentNode, pf.DiagonalMovement.Never); // gives me nodes
 		for(var k = 0; k < neighbours.length; k++){
 		    var neighbour = neighbours[k];
@@ -165,6 +162,7 @@ function findFarthestPointPath(mySnake, grid) {
     }
 
     var path = shortestPath_(mySnake, [farthest.node.x, farthest.node.y], gridCopy);
+    console.trace();
     console.log("Path to farthest point:");
     console.log(path[0],path[path.length - 1]);
     console.log("I worked.");
@@ -206,7 +204,7 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
 
     var posChanged = false;
     for(var i = 0; i < closestFoodInOrder.length; i++){
-        for(var j = 0; j < enemySnakes.head.length; j++) {
+        for(var j = 0; j < enemySnakes.head.length; j++) :{
             var snakehead = enemySnakes.head[j];
             //distance between enemy snake to current best food
             if(mySnake.health >= 20){
@@ -274,11 +272,7 @@ function withinCentre_(x,y,width, height, mySnake){
 }
 
 function getSafeTail_(mySnake, grid, tail) {
-
-    if(!tail){
-        return findFarthestPointPath(mySnake, grid.clone());
-    }
-
+    
     var x = tail[0];
     var y = tail[1];
 
@@ -349,7 +343,6 @@ function nextStepTail_(mySnake, grid){
     var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
 
     console.log("TAILPATH IN nextStepTail_:");
-    console.log(tailPath);
 
     if( tailPath.length > 2 && canReturnFromPoint_(mySnake, gridCopy, tailPath)){
         return findDirection_(mySnake.head, tailPath[1]);
@@ -386,7 +379,6 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     mySnakeCopy.tail = mySnakeCopy.coords[mySnakeCopy.coords.length-1];
     mySnakeCopy.head = mySnakeCopy.coords[0];
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
-    console.log(pathToTail);
     //check next condition
     if(pathToTail && pathToTail.length > 2) {
         console.log("YES, I CAN")
@@ -401,14 +393,13 @@ function goToTail_(mySnake, grid) {
     var safeToTailPath = getSafeTail_(mySnake, grid.clone(), mySnake.tail);
     if(safeToTailPath.length <= 2){
         safeToTailPath = findFarthestPointPath(mySnake, grid.clone());
-        console.log("Corner Path found:");
+        console.log("Farthest point path found:");
     }
 
     else{
         console.log("Safe to tail path found:");
     }
 
-    console.log(safeToTailPath);
     return safeToTailPath;
 }
 

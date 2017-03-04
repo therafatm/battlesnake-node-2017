@@ -36,10 +36,10 @@ router.post(config.routes.move, function (req, res) {
 
   console.time("Move");
   var body = req.body;
-  console.dir(body, {
-    depth: null,
-    colors: true
-  });
+  // console.dir(body, {
+  //   depth: null,
+  //   colors: true
+  // });
   console.log("TURN: " + body.turn);
   var win = 'up';
   var enemySnakes = {head:[], len:[]};
@@ -78,12 +78,6 @@ router.post(config.routes.move, function (req, res) {
     }
     
     console.log("Food to get pos after:");
-    //console.log(foodToGetPos);
-
-    // console.dir(closestFoodPaths, {
-    //   depth: null,
-    //   colors: true
-    // });
 
   }
 
