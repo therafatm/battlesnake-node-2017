@@ -214,7 +214,6 @@ var findClosestFoodPathsInOrder_ = function(foodArray, mySnake, gridCopy){
 	return foodPaths;
 };
 
-
 // returns -1 if no best path exists
 var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake, grid, foodArray){
 
@@ -225,25 +224,26 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake, gr
             //distance between enemy snake to current best food
             var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
             if((distance < closestFoodInOrder[i].length) ||
-                (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
-                //TODO: eat snake
+                (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len) ){
+
                 var snakesClosestFoods = findClosestFoodPathsInOrder_(foodArray, {head: enemySnakes.head[j]}, grid.clone());
                 if(snakesClosestFoods.length > 0){
                     var topFoodPath = snakesClosestFoods[0];
-                    var topFoodPathPos = topFoodPath[topFoodPath.length - 1];
-                    if((topFoodPathPos[0] === closestFoodInOrder[i][0]) && (topFoodPathPos[1] === closestFoodInOrder[i][1])){
-                        if(!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodInOrder[i])){
-                            if((findDistance(closestFoodInOrder[i],mySnake.coords[mySnake.len-1]) === 1) 
-                                && (findDistance(closestFoodInOrder[i],mySnake.coords[0]) === 1)
-                                ){
-                                posChanged = true;
-                                break;                                
-                            }
-                        }
+                    var topFood = topFoodPath[topFoodPath.length - 1];
+                    if((topFood[0] === closestFoodInOrder[i][0]) && (topFood[1] === closestFoodInOrder[i][1])){
+                        posChanged = true;
+                        break; 
                     }
                 }
             }
+
+            if(!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodInOrder[i]) || 
+                ((findDistance(closestFoodInOrder[i],mySnake.coords[mySnake.len-1]) === 1) && (findDistance(closestFoodInOrder[i],mySnake.coords[0]) === 1))){
+                    posChanged = true;
+                    break; 
+            }
         }
+        
         if(!posChanged){
             return i;
         }
