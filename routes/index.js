@@ -69,7 +69,7 @@ router.post(config.routes.move, function (req, res) {
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake);
 
     console.log("Food to get pos before:");
-    //console.log(foodToGetPos);
+    console.log(foodToGetPos);
 
     if (foodToGetPos !== -1 && mySnake.health >= 20) {
       if (!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodPaths[foodToGetPos])) {
@@ -128,7 +128,7 @@ router.post(config.routes.move, function (req, res) {
 
   console.log(win);
   if(!win) {
-	throw error();
+	throw new Error();
   }
   console.timeEnd("Move");
   return res.json(data);

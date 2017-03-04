@@ -214,16 +214,10 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake){
         for(var j = 0; j < enemySnakes.head.length; j++) {
             var snakehead = enemySnakes.head[j];
             //distance between enemy snake to current best food
-            if(mySnake.health >= 20){
-                var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
-                if((distance < closestFoodInOrder[i].length) ||
-                    (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
-                    //TODO: eat snake
-                    posChanged = true;
-                    break;
-                }                
-            }
-            else {
+            var distance = findDistance(snakehead, closestFoodInOrder[i][closestFoodInOrder[i].length - 1]);
+            if((distance < closestFoodInOrder[i].length) ||
+                (distance === closestFoodInOrder[i].length && enemySnakes.len[j] >= mySnake.len)){
+                //TODO: eat snake
                 posChanged = true;
                 break;
             }
@@ -343,6 +337,11 @@ function checkForEmptyCorners(grid, mySnake){
                 return toCorner;
             }
         }
+        else {
+            console.log("Corner ");
+            console.log([x,y]);
+            console.log(" is not walkable.");
+        }
     }
 
     console.log("No empty corners found. No path to tail found.");
@@ -391,7 +390,7 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
     mySnakeCopy.head = mySnakeCopy.coords[0];
     var pathToTail = goToTail_(mySnakeCopy, gridCopy);
     //check next condition
-    var pathToCorner= checkForEmptyCorners(grid.clone(), mySnakeCopy);
+    var pathToCorner= checkForEmptyCorners(gridCopy.clone(), mySnakeCopy);
     if((pathToTail && pathToTail.length > 2) && (pathToCorner && pathToCorner.length > 2) ) {
         console.log("YES, I CAN")
         return true;
