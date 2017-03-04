@@ -87,7 +87,9 @@ router.post(config.routes.move, function (req, res) {
     console.log("SAFE MODE");
 
     //if not at centre, go to centre
-    if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake)){
+      if(!ai.withinCentre(mySnake.head[0], mySnake.head[1], body.width, body.height, mySnake)
+          && (mySnake.len <= (body.width * 1.5)) 
+      ){
       console.log("im not within centre");
       var shortestPathToCentre = ai.goToCentre(mySnake, grid);
       if (shortestPathToCentre.length > 1) {

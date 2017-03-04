@@ -402,14 +402,6 @@ function canReturnFromPoint_(mySnake, grid, foodPath) {
 
 function goToTail_(mySnake, grid) {
     var safeToTailPath = getSafeTail_(mySnake, grid.clone(), mySnake.tail);
-    if(safeToTailPath.length <= 2){
-        safeToTailPath = findFarthestPointPath(mySnake, grid.clone());
-        console.log("Farthest point path found:");
-    }
-
-    else{
-        console.log("Safe to tail path found:");
-    }
 
     return safeToTailPath;
 }
