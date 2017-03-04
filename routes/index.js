@@ -66,6 +66,7 @@ router.post(config.routes.move, function (req, res) {
 
   var closestFoodPaths = ai.findClosestFoodPathsInOrder(foodArray, mySnake, grid.clone());
   if(closestFoodPaths.length && enemySnakes.head.length && mySnake.health <= 85){
+    console.log("Prioritizing Food.");
     foodToGetPos = ai.findBestFoodPathPos(closestFoodPaths, enemySnakes, mySnake, grid, foodArray);
   }
     console.log("Food to get pos:");
