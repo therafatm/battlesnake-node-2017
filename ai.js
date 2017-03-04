@@ -237,7 +237,7 @@ var findBestFoodPathPos_ = function(closestFoodInOrder, enemySnakes, mySnake, gr
                 }
             }
 
-            if(!ai.canReturnFromPoint(mySnake, grid.clone(), closestFoodInOrder[i]) || 
+            if(canReturnFromPoint_(mySnake, grid.clone(), closestFoodInOrder[i]) || 
                 ((findDistance(closestFoodInOrder[i],mySnake.coords[mySnake.len-1]) === 1) && (findDistance(closestFoodInOrder[i],mySnake.coords[0]) === 1))){
                     posChanged = true;
                     break; 
