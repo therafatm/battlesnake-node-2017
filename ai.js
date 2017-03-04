@@ -277,8 +277,15 @@ function getSafeTail_(mySnake, grid, tail) {
     var x = tail[0];
     var y = tail[1];
     var offsetFromTail = 2;
-    if(mySnake.len >= 15){
+    if(mySnake.len >= 35){
         offsetFromTail = 1;
+    }
+
+    grid.setWalkableAt(x,y, true);
+
+    if (grid.isInside(x,y) && grid.isWalkableAt(x,y)) {
+        var toTail = shortestPath_(mySnake, [x,y], grid.clone());
+        if(toTail.length>1) return toTail;
     }
 
     if (grid.isInside(x,y+offsetFromTail) && grid.isWalkableAt(x,y+offsetFromTail)) {
