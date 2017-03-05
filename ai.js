@@ -421,6 +421,8 @@ function nextStepTail_(mySnake, grid, enemySnakes){
         for (var i=0; i<enemySnakes.head.length; i++) {
             markEnemySides_(enemySnakes.head[i], grid, false);
         }
+
+        grid.setWalkableAt(mySnake.coords[mySnake.len-1][0], mySnake.coords[mySnake.len-1][1], true);
         var gridCopy = grid.clone();
         var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
         if(tailPath.length > 1){
