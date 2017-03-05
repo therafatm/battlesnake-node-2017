@@ -91,8 +91,7 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, fails
 		}
 		else{
             enemySnakes.head.push(s.coords[0]);
-            if (!failsafe && mySnake.len < 15)
-                markEnemySides_(s.coords[0],grid);
+            markEnemySides_(s.coords[0],grid, true);
             enemySnakes.len.push(s.coords.length);
 		}
 
@@ -115,21 +114,21 @@ var initSelfGridSnakeHeads_ = function(snakes, grid, mySnake, enemySnakes, fails
 	});
 };
 
-var markEnemySides_ = function(head, grid) {
+var markEnemySides_ = function(head, grid, markEnemy) {
     var x = head[0];
     var y = head[1];
 
     if (grid.isInside(x,y+1)) {
-        grid.setWalkableAt(x,y+1, false);
+        grid.setWalkableAt(x,y+1, !markEnemy);
     }
     if (grid.isInside(x,y-1)) {
-      grid.setWalkableAt(x,y-1, false);
+      grid.setWalkableAt(x,y-1,!markEnemy);
     }
     if (grid.isInside(x+1,y))  {
-      grid.setWalkableAt(x+1,y,false);
+      grid.setWalkableAt(x+1,y, !markEnemy);
     }
     if (grid.isInside(x-1,y)) {
-      grid.setWalkableAt(x-1,y,false);
+      grid.setWalkableAt(x-1,y,!markEnemy);
     }
 
 }
@@ -310,7 +309,7 @@ var goToCentre_ = function(mySnake, gridCopy, enemySnakes){
     }
 
     console.log("No space in centre found.");
-    var cornerPath = findFarthestPointPath(mySnake, gridCopy);
+    var cornerPath = getSafeTail_(mySnake, gridCopy, mySnake.coords[mySnake.len-1]);
     return cornerPath;
     //if no corner path, idk what to do
 }
@@ -357,11 +356,11 @@ function getSafeTail_(mySnake, grid, tail) {
     }
 
 
-    grid.setWalkableAt(x,y, true);
-    if (grid.isInside(x,y) && grid.isWalkableAt(x,y)) {
-        var toTail = shortestPath_(mySnake, [x,y], grid.clone());
-        if(toTail.length>1) return toTail;
-    }
+    // grid.setWalkableAt(x,y, true);
+    // if (grid.isInside(x,y) && grid.isWalkableAt(x,y)) {
+    //     var toTail = shortestPath_(mySnake, [x,y], grid.clone());
+    //     if(toTail.length>1) return toTail;
+    // }
 
     //Edge case??
     console.log("No safe path to tail found.");
@@ -410,7 +409,7 @@ function checkForEmptyCorners(grid, mySnake){
     return [[]]
 }
 
-function nextStepTail_(mySnake, grid){
+function nextStepTail_(mySnake, grid, enemySnakes){
     var gridCopy = grid.clone();
     var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
 
@@ -419,11 +418,19 @@ function nextStepTail_(mySnake, grid){
     if(tailPath.length > 1){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
+        for (var i=0; i<enemySnakes.head.length; i++) {
+            markEnemySides_(enemySnakes.head[i], grid, false);
+        }
+        var gridCopy = grid.clone();
+        var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
+        if(tailPath.length > 1){
+
         //no path to tail
-        console.log("no path to tail");
-        var farthestPointPath = findFarthestPointPath(mySnake, gridCopy.clone()); 
-        if(farthestPointPath && farthestPointPath.length > 1){
-            return findDirection_(mySnake.head, farthestPointPath[1]); 
+            console.log("no path to tail");
+            var farthestPointPath = findFarthestPointPath(mySnake, gridCopy.clone()); 
+            if(farthestPointPath && farthestPointPath.length > 1){
+                return findDirection_(mySnake.head, farthestPointPath[1]); 
+            }
         }
         else {
             //I'm constricted

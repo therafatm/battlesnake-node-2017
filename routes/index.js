@@ -64,8 +64,8 @@ router.post(config.routes.move, function (req, res) {
   console.log("My Snake");
   console.log(mySnake);
 
-  var healthOffset = 85;
-  if(mySnake.len > 45){
+  var healthOffset = 100;
+  if(mySnake.len > 40){
     healthOffset = 70;
   }
 
@@ -97,17 +97,17 @@ router.post(config.routes.move, function (req, res) {
         //no path to tail from next pos to centre 
         else {
           console.log("no path to tail from next pos to centre");
-          win = ai.nextStepTail(mySnake, grid);
+          win = ai.nextStepTail(mySnake, grid, enemySnakes);
         }
       } else {
         // no path to centre
         console.log("no path to centre. following tail.");        
-        win = ai.nextStepTail(mySnake, grid);
+          win = ai.nextStepTail(mySnake, grid, enemySnakes);
       }
     }
     else {
       console.log("I'm within centre. following tail");      
-      win = ai.nextStepTail(mySnake, grid);
+          win = ai.nextStepTail(mySnake, grid, enemySnakes);
     }
   }
 
