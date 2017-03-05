@@ -61,6 +61,8 @@ router.post(config.routes.move, function (req, res) {
   // init me, board, enemy tiles -- args(snakes, grid, mySnake, enemySnakeHeads)
   ai.initSelfGridSnakeHeads(snakes, grid, mySnake, enemySnakes, false);
   // find closest food list -- args(foodArray, mySnake, gridCopy)
+  var originalGrid = grid.clone();
+  ai.markSides(grid, false);
   console.log("My Snake");
   console.log(mySnake);
 
@@ -97,17 +99,17 @@ router.post(config.routes.move, function (req, res) {
         //no path to tail from next pos to centre 
         else {
           console.log("no path to tail from next pos to centre");
-          win = ai.nextStepTail(mySnake, grid, enemySnakes);
+          win = ai.nextStepTail(mySnake, grid, enemySnakes, originalGrid);
         }
       } else {
         // no path to centre
         console.log("no path to centre. following tail.");        
-          win = ai.nextStepTail(mySnake, grid, enemySnakes);
+          win = ai.nextStepTail(mySnake, grid, enemySnakes, originalGrid);
       }
     }
     else {
       console.log("I'm within centre. following tail");      
-          win = ai.nextStepTail(mySnake, grid, enemySnakes);
+          win = ai.nextStepTail(mySnake, grid, enemySnakes, originalGrid);
     }
   }
 

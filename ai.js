@@ -409,7 +409,24 @@ function checkForEmptyCorners(grid, mySnake){
     return [[]]
 }
 
-function nextStepTail_(mySnake, grid, enemySnakes){
+function markSides(grid, mark){
+    console.dir(grid, {
+        depth: null
+    });
+    for(var i=0; i<grid.width; i++) {
+        grid.setWalkableAt(i, 0, mark);
+        grid.setWalkableAt(i, grid.height-1, mark);
+    }
+    for(var i=0; i<grid.height; i++) {
+        grid.setWalkableAt(0, i, mark);
+        grid.setWalkableAt(grid.width-1, i, mark);
+    }
+    console.dir(grid, {
+        depth: null
+    });
+}
+
+function nextStepTail_(mySnake, grid, enemySnakes, originalGrid) {
     var gridCopy = grid.clone();
     var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
 
@@ -418,26 +435,37 @@ function nextStepTail_(mySnake, grid, enemySnakes){
     if(tailPath.length > 1){
         return findDirection_(mySnake.head, tailPath[1]);
     } else {
-        for (var i=0; i<enemySnakes.head.length; i++) {
-            markEnemySides_(enemySnakes.head[i], grid, false);
-        }
 
-        grid.setWalkableAt(mySnake.coords[mySnake.len-1][0], mySnake.coords[mySnake.len-1][1], true);
-        var gridCopy = grid.clone();
+        console.log("Marking Sides");
+        var gridCopy = originalGrid.clone();
         var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
         if(tailPath.length > 1){
-
-        //no path to tail
-            console.log("no path to tail");
-            var farthestPointPath = findFarthestPointPath(mySnake, gridCopy.clone()); 
-            if(farthestPointPath && farthestPointPath.length > 1){
-                return findDirection_(mySnake.head, farthestPointPath[1]); 
+            console.log("Taking Path over the sides");
+            console.log("TAILPATH");
+            console.log(tailPath);
+            return findDirection_(mySnake.head, tailPath[1]);
+        } else {
+            for (var i=0; i<enemySnakes.head.length; i++) {
+                markEnemySides_(enemySnakes.head[i], grid, false);
             }
-        }
-        else {
-            //I'm constricted
-            //find farthest corner from itself
-            console.assert(true, "Should never happen.");
+            grid.setWalkableAt(mySnake.coords[mySnake.len-1][0], mySnake.coords[mySnake.len-1][1], true);
+            var gridCopy = grid.clone();
+            var tailPath = getSafeTail_(mySnake, gridCopy, mySnake.tail);
+            if(tailPath.length > 1){
+                return findDirection_(mySnake.head, tailPath[1]);
+            } else {
+                //no path to tail
+                console.log("no path to tail");
+                var farthestPointPath = findFarthestPointPath(mySnake, gridCopy.clone()); 
+                if(farthestPointPath && farthestPointPath.length > 1){
+                    return findDirection_(mySnake.head, farthestPointPath[1]); 
+                }
+                else {
+                    //I'm constricted
+                    //find farthest corner from itself
+                    console.assert(true, "Should never happen.");
+                }
+            }
         }
     }
 }
@@ -490,7 +518,8 @@ var api = {
     goToTail : goToTail_,
     nextStepTail : nextStepTail_,
     canReturnFromPoint : canReturnFromPoint_,
-    findEmptyNeighbour : findEmptyNeighbour_
+    findEmptyNeighbour : findEmptyNeighbour_,
+    markSides: markSides
 };
 
 module.exports = api;
