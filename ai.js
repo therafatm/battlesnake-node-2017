@@ -410,9 +410,6 @@ function checkForEmptyCorners(grid, mySnake){
 }
 
 function markSides(grid, mark){
-    console.dir(grid, {
-        depth: null
-    });
     for(var i=0; i<grid.width; i++) {
         grid.setWalkableAt(i, 0, mark);
         grid.setWalkableAt(i, grid.height-1, mark);
@@ -421,9 +418,6 @@ function markSides(grid, mark){
         grid.setWalkableAt(0, i, mark);
         grid.setWalkableAt(grid.width-1, i, mark);
     }
-    console.dir(grid, {
-        depth: null
-    });
 }
 
 function nextStepTail_(mySnake, grid, enemySnakes, originalGrid) {
